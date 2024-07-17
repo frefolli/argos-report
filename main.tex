@@ -114,4 +114,36 @@
     \renewcommand{\baselinestretch}{1.5}
 
 \printbibliography[title={Bibliografia}]
+
+\section{Introduzione}
+
+La \textbf{Swarm Robotics} \`e un filone di ricerca della robotica che si occupa di costruire sistemi intelligenti formati da una moltitudine di droni/robot indipendenti (eventualmente eterogenei) per raggiungere tramite algoritmi fortemente decentralizzati un obiettivo di collettivo interesse (rispetto allo sciame).
+Le applicazioni della Swarm Robotics spaziano in campo civile e militare.
+Solitamente la ricerca si concentra su scenari che prevedono il salvataggio, la ricognizione o una battaglia.
+Tuttavia essendo un concetto molto astratto vengono anche applicati alla costruzione di algoritmi di ottimizzazione.
+
+Per la realizzazione di questi esperimenti sono stati costruiti diversi simulatori e qualche framework fisico per l'implementazione di sciami di robot dal basso costo.
+L'obiettivo del progetto \`e simulare uno sciame il cui scopo \`e dividersi in squadroni, decollare ed approcciare degli obiettivi sparsi nell'ambiente.
+Per la simulazione ci siamo avvalsi di ARGoS, un simulatore programmabile Free and Open Source.
+
+\subsection{ARGoS}
+
+ARGoS \`e un simulatore di droni che permette di utilizzare diversi engine fisici a 2 o 3 dimensioni e aggiungere programmaticamente plugin per nuovi droni o nuovi contenuti.
+
+Per comandare un drone si deve implementare un \textbf{Controller}, il quale tramite \textbf{Attuatori} e \textbf{Sensori} pu\`o interagine con l'ambiente e con gli altri droni.
+Si possono inoltre costruire delle \textbf{Loop Function}, funzioni solitamente utilizzate per interagire con la simulazione, e \textbf{User Functions}, funzioni che permettono di interagire con lo stack grafico di ARGoS.
+Queste integrazioni vengono realizzate sotto forma di plugins che possono essere caricati dinamicamente tramite una configurazione XML di una simulazione.
+
+\putimage{images/architecture.png}{Architettura di ARGoS}{png:architecture}
+
+\subsection{Modello}
+
+\putimage{images/simulation-model.png}{Modello della Simulazione}{png:simulation-model}
+
+\section{Strategie implementate}
+
+\section{Risultati}
+
+\section{Conclusione}
+
 \end{document}
