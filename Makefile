@@ -2,6 +2,8 @@
 
 main.pdf: main.tex
 	pdflatex main.tex
+	bibtex main.aux
+	pdflatex main.tex
 
 send: main.pdf
 	mv main.pdf ~/Desktop/argos-report.pdf

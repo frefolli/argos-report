@@ -13,6 +13,16 @@
 \newcommand{\cmark}{\ding{51}}%
 \newcommand{\xmark}{\ding{55}}%
 
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    pdftitle={Overleaf Example},
+    pdfpagemode=FullScreen,
+    }
+
 \usepackage{listings}
 \usepackage{listings-cpp}
 \usepackage{algorithm}
@@ -26,7 +36,7 @@
   style=numeric,
   sorting=ydnt
   ]{biblatex}
-\addbibresource{refs.bib}
+\addbibresource{quotes.bib}
 \makeindex
 
 \newcommand{\putimage}[4] {
@@ -113,8 +123,6 @@
     \tableofcontents
     \renewcommand{\baselinestretch}{1.5}
 
-\printbibliography[title={Bibliografia}]
-
 \section{Introduzione}
 
 La \textbf{Swarm Robotics} \`e un filone di ricerca della robotica che si occupa di costruire sistemi intelligenti formati da una moltitudine di droni/robot indipendenti (eventualmente eterogenei) per raggiungere tramite algoritmi fortemente decentralizzati un obiettivo di collettivo interesse (rispetto allo sciame).
@@ -124,7 +132,7 @@ Tuttavia essendo un concetto molto astratto vengono anche applicati alla costruz
 
 Per la realizzazione di questi esperimenti sono stati costruiti diversi simulatori e qualche framework fisico per l'implementazione di sciami di robot dal basso costo.
 L'obiettivo del progetto \`e simulare uno sciame il cui scopo \`e dividersi in squadroni, decollare ed approcciare degli obiettivi sparsi nell'ambiente.
-Per la simulazione ci siamo avvalsi di ARGoS, un simulatore programmabile Free and Open Source.
+Per la simulazione ci siamo avvalsi di ARGoS \cite{Pinciroli:SI2012}, un simulatore programmabile Free and Open Source.
 
 \section{ARGoS}
 
@@ -157,6 +165,12 @@ Sia il TaskAllocator che il TaskExecutor possiedono uno stato che comanda la lor
 Di base essa termina solo quando tutti i droni \textit{ritengono} di aver finito il compito. Questo pu\`o avvenire in segui al superamento del numero massimo di iterazioni (\textit{MAX\_ITERATION}), oppure quando il TaskExecutor rileva di essere rimasto \textit{fermo} (o \textit{quasi fermo} oltre una certa soglia di trascurabilit\`a), oppure nel caso in cui si necessita che il TaskAllocator termini dopo aver superato una fase di definizione del target da perseguire.
 Quest'ultimo scenario \`e utile quando si vuole valutare l'operato di diverse strategie di allocazione delle attivit\`a.
 
+\paragraph{Codice Sorgente}
+
+Il codice di questa implementazione \`e disponibile nel repository Github \textbf{\href{http://github.com/frefolli/argos-experiments}{frefolli/argos-experiments}} \cite{RF:AE}.
+Per le analisi sui risultati sono stati scritti inoltre degli script Python per elaborare i log prodotti dai controller, diponibili nel repository \textbf{\href{http://github.com/frefolli/argos-visualizer}{frefolli/argos-visualizer}} \cite{RF:AV} insieme ad un ulteriore simulatore che permette di riprodurre (sebbene in modo pi\`u semplice) i log in forma di simulazione grafica.
+Infine si \`e fatto uso di una versione modifica di ARGoS per correggere alcuni errori / implementare alcune feature lasciate parzialmente inutilizzabili dallo sviluppatore originale del simulatore. Questa versione modificata \`e disponibile nel repository \textbf{\href{http://github.com/frefolli/argos3}{frefolli/argos3}} \cite{RF:A3}.
+
 \putimage{images/simulation-model.png}{Modello della Simulazione}{png:simulation-model}{0.99}
 
 \section{Strategie implementate}
@@ -168,5 +182,7 @@ Quest'ultimo scenario \`e utile quando si vuole valutare l'operato di diverse st
 \section{Risultati}
 
 \section{Conclusione}
+
+\printbibliography[title={Bibliografia}]
 
 \end{document}
