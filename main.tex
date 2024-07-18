@@ -126,21 +126,44 @@ Per la realizzazione di questi esperimenti sono stati costruiti diversi simulato
 L'obiettivo del progetto \`e simulare uno sciame il cui scopo \`e dividersi in squadroni, decollare ed approcciare degli obiettivi sparsi nell'ambiente.
 Per la simulazione ci siamo avvalsi di ARGoS, un simulatore programmabile Free and Open Source.
 
-\subsection{ARGoS}
+\section{ARGoS}
 
 ARGoS \`e un simulatore di droni che permette di utilizzare diversi engine fisici a 2 o 3 dimensioni e aggiungere programmaticamente plugin per nuovi droni o nuovi contenuti.
 
+In figura \ref{png:architecture} \`e riportato uno schema di funzionamento dell'engine di ARGoS da cui si possono trarre alcune osservazioni.
 Per comandare un drone si deve implementare un \textbf{Controller}, il quale tramite \textbf{Attuatori} e \textbf{Sensori} pu\`o interagine con l'ambiente e con gli altri droni.
+Solitamente questi componenti si appoggiano su un \textbf{Media} che costituisce il canale di comunicazione e storage delle informazioni.
+Un altro valido strumento fornito al programmatore sono le \textbf{Loop Functions}, funzioni che vengono eseguite ad ogni tick, all'inizio o alla fine della simulazione per consentire interazioni custom con l'ambiente o di inizializzare la simulazione (per esempio istanziando oggetti o facendo controlli).
+Una variante di queste sono le \textbf{User Functions}, che vengono solitamente impiegate per costruire effetti visivi in quanto permettono di interagire con lo stack grafico di ARGoS, per esempio disegnando label sulle entit\`a.
 Si possono inoltre costruire delle \textbf{Loop Function}, funzioni solitamente utilizzate per interagire con la simulazione, e \textbf{User Functions}, funzioni che permettono di interagire con lo stack grafico di ARGoS.
-Queste integrazioni vengono realizzate sotto forma di plugins che possono essere caricati dinamicamente tramite una configurazione XML di una simulazione.
+Queste integrazioni vengono realizzate sotto forma di plugins che possono essere caricati dinamicamente tramite una configurazione XML di una simulazione, che permette anche di disporre automaticamente delle entit\`a nello spazio, di configurare i controller e abilitare le functions (non si possono utilizzare pi\`u di una Loop Function e di una User Function contemporaneamente).
+L'Ambiente \`e definito in ARGoS in alcuni contesti \textit{Arena} ma \`e sostanzialmente un termine intercambiabile.
 
-\putimage{images/architecture.png}{Architettura di ARGoS}{png:architecture}
+\putimage{images/architecture.png}{Architettura di ARGoS}{png:architecture}{0.99}
 
-\subsection{Modello}
+\section{Modello}
 
-\putimage{images/simulation-model.png}{Modello della Simulazione}{png:simulation-model}
+In figura \ref{png:simulation-model} si riporta lo schema logico dei componenti implementati per la simulazione.
+Il \textit{cervello} del drone \`e suddiviso in due emisferi: un \textbf{TaskAllocator} che si occupa di decidere a quale squadrone deve mirare e quindi dove andare, un \textbf{TaskExecutor} che esegue questa volont\`a decidendo come raggiungere gli obiettivi del drone e come evitare intoppi (per esempio collisioni).
+Entrambi questi componenti fanno uso di un \textbf{Random Number Generator}, del \textbf{Positioning Sensor} (che fornisce informazioni circa il proprio orientamento e il proprio posizionamento nell'ambiente) e un \textbf{Range And Bearing Sensor}.
+
+Il \textit{Range and Bearing} \`e un mezzo simile ad una antenna radio che permette di inviare e ricevere segnali. Questo viene fatto all'interno di ARGoS tramite un buffer di memoria dalla dimensione prefissata (\textit{RAB\_size}) all'inizio della simulazione.
+Il sensore \textit{riceve} questi segnali da una distanza massima prefissata (\textit{RAB\_range}), e fornisce al controllore che li processia sia il contenuto del messaggio (\textit{Data}), sia la distanza da cui \`e stato percepito (\textit{Range}) e l'orientamento locale al sistema di riferimento del drone da cui proviene (\textit{HorizontalBearing e VerticalBearing}).
+Per non complicare troppo il modello si \`e deciso di impostare il \textit{RAB\_range} ad un valore sufficiente per consentire a tutti i droni di ricevere tutti i segnali da ogni parte dell'Arena.
+Per come \`e stato implementato in ARGoS non \`e possibile aggiornare lo stato dell'attuatore solo quando cambia uno stato locale ma \`e necessario scrivere un valore ogni volta. % (poteva essere implementato in modo pi\`u performante).
+Dei dati che devono essere scritti sull'attuatore se ne occupa il Controller, il quale mantiene anche un \textbf{log} con alcune informazioni circa lo stato del drone e della simulazione dal punto di vista locale di esso.
+
+Sia il TaskAllocator che il TaskExecutor possiedono uno stato che comanda la loro operazione, in particolare in base alle esigenze della simulazione gli stati pozzo (\textit{Idle} e \textit{Arrived}) possono essere utilizzati per terminare la simulazione.
+Di base essa termina solo quando tutti i droni \textit{ritengono} di aver finito il compito. Questo pu\`o avvenire in segui al superamento del numero massimo di iterazioni (\textit{MAX\_ITERATION}), oppure quando il TaskExecutor rileva di essere rimasto \textit{fermo} (o \textit{quasi fermo} oltre una certa soglia di trascurabilit\`a), oppure nel caso in cui si necessita che il TaskAllocator termini dopo aver superato una fase di definizione del target da perseguire.
+Quest'ultimo scenario \`e utile quando si vuole valutare l'operato di diverse strategie di allocazione delle attivit\`a.
+
+\putimage{images/simulation-model.png}{Modello della Simulazione}{png:simulation-model}{0.99}
 
 \section{Strategie implementate}
+
+\subsection{TaskAllocator}
+
+\subsection{TaskExecutor}
 
 \section{Risultati}
 

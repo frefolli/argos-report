@@ -1,0 +1,49 @@
+Controller: {
+  shape: class
+  Init(config)
+  ControlStep()
+  Reset()
+  Destroy()
+}
+
+Task: {
+  shape: class
+  id
+  target
+  speed
+  target_direction
+  distance_from_target
+}
+
+TaskAllocator: {
+  shape: class
+  + Round()
+  - Start()
+  - Review()
+  - Idle()
+}
+
+TaskExecutor: {
+  shape: class
+  + Round()
+  - Start()
+  - AtGround()
+  - TakingOff()
+  - TakenOff()
+  - Arrived()
+}
+
+Controller -> RangeAndBearingActuator
+
+TaskExecutor -> RandomNumberGenerator
+TaskExecutor -> PositioningSensor
+TaskExecutor -> RangeAndBearingSensor
+TaskExecutor -> QuadRotorSpeedActuator
+
+TaskAllocator -> RandomNumberGenerator
+TaskAllocator -> PositioningSensor
+TaskAllocator -> RangeAndBearingSensor
+
+Controller -> Task
+Controller -> TaskAllocator -> Task
+Controller -> TaskExecutor -> Task
