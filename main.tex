@@ -177,7 +177,26 @@ Infine si \`e fatto uso di una versione modifica di ARGoS per correggere alcuni 
 
 \subsection{TaskAllocator}
 
+Ogni drone all'inizio della simulazione sceglie un target iniziale, questo pu\`o essere fatto scegliendo un target a caso o prendendo il pi\`u vicino.
+Il secondo approccio punta a minimizzare le disanze, ma il secondo (se la distribuzione \`e uniforme) tende a minimizzare la varianza delle grandezze degli squadroni.
+Si ricorda che ogni squadrone \`e definito come i droni che agganciano un target.
+
+Dopo una fase iniziale di scelta si pu\`o decidere di proseguire senza ulteriori modifiche o di eseguire qualche iterazione di un algoritmo decentralizzato che tenti equilibrare le composizioni degli squadroni.
+In particolare si \`e scelto di concentrarsi su due strategie simili: se lo squadrone a cui \`e assegnato un drone ha pi\`u droni assegnati del necessario, allora cambio squadrone scegliendone uno a caso o il pi\`u \textit{piccolo}.
+Questo pu\`o avvenire sempre o con una certa probabilit\`a. Questa governa sia la probabilit\`a che la distribuzioni diventi pi\`u equa sia il numero di cambi che vengono effettuati (rendendo pi\`u instabile lo stato globale).
+
 \subsection{TaskExecutor}
+
+Dopo una fase iniziale di attesa il drone passa in modalit\`a decollo. Questo pu\`o avvenire tramite un iniziale decollo verticale e un successivo volo quasi orizzontale verso il target, oppure tramite un decollo diretto.
+La fase di decollo \`e governata tramite un audit dei droni nelle vicinanze per dare priorit\`a al decollo dei droni con ID pi\`u alto.
+Un drone che ha raggiunto la quota di volo o che decolla direttamente deve eseguire un algoritmo che permette allo stesso di volare in direzione del target ma anche di evitare gli altri droni che ostacolano il percorso.
+Questo \`e fatto tramite l'applicazione di due potenziali che sono stati implementati: \textbf{GP} \`e un potenziale ispirato dalla gravit\`a, \textbf{LP} \`e derivato dal potenziale di Lennard Jones.
+
+Come detto in precedenza, l'esecutore misura la differenza tra la posizione rilevata correntemente e quella rilevata nel tick precedente, la utilizza per stabilire la velocit\`a con cui si \`e mosso il drone in precedenza e in base alla magnitudine di essa decide se \`e fermo o quasi fermo.
+In particolare noi consideriamo fermo un drone la cui velocit\`a istantanea \`e inferiore a $10e-4$.
+
+Infine abbiamo cosiderato la possibilit\`a di introdurre del rumore nel vettore della velocit\`a desiderata dall'esecutore per creare dell'instabilit\`a sufficiente a smuovere alcune situazioni di deadlock che si potrebbero creare.
+Per realizzare ci\`o \`e fondamentale valutare l'impatto del coefficiente di rumore per evitare che l'instabilit\`a sia tale da non permettere alla simulazione di convergere.
 
 \section{Risultati}
 
