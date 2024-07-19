@@ -1,0 +1,29 @@
+direction: right
+
+P_0: Start
+P_1: Choose Target
+P_2: Review?
+P_3: Collect Squadrons Data
+P_4: Is my Squadron in Excess?
+P_5: Change Target?
+P_6: Choose new Target
+P_N: End
+
+P_0 -> P_1
+P_1 -> P_2: Random
+P_1 -> P_2: Nearest
+
+P_2 -> P_3: Yes
+P_3 -> P_4
+
+P_4 -> P_5: Yes
+
+P_5 -> P_6: Always
+P_5 -> P_6: Probably Yes
+P_5 -> P_2: Probably No
+
+P_6 -> P_4: Random
+P_6 -> P_4: Worst
+
+P_4 -> P_N: No
+P_2 -> P_N: No

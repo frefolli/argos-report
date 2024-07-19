@@ -185,6 +185,9 @@ Infine si \`e fatto uso di una versione modifica di ARGoS per correggere alcuni 
 \section{Strategie implementate}
 
 \subsection{TaskAllocator}
+
+Un riassunto dell'implementazione del TaskAllocator \`e osservabile in figura \ref{png:task-allocator}.
+
 \subsubsection{Scelta iniziale del Target}
 Ogni drone all'inizio della simulazione sceglie un target iniziale, questo pu\`o essere fatto scegliendo un target a caso o prendendo il pi\`u vicino.
 Il secondo approccio punta a minimizzare le disanze, ma il secondo (se la distribuzione \`e uniforme) tende a minimizzare la varianza delle grandezze degli squadroni.
@@ -198,20 +201,32 @@ Nel caos in cui per un drone sia possibile cambiare il prprio target, abbiamo cr
     \item cambio squadrone scegliendone uno a caso
     \item cambio squadrone scegliendo quello più bisognoso di droni.
 \end{enumerate}
+
 La rilocazione, nel caso in qui in mio squadrone sia  pu\`o avvenire sempre o con una certa probabilit\`a. Questa governa sia la probabilit\`a che la distribuzione di droni negli squadroni diventi pi\`u equa sia il numero di cambi che vengono effettuati (rendendo pi\`u instabile lo stato globale).
+
+\putimage{images/task-allocator.png}{Comportamento del Task Allocator}{png:task-allocator}{0.99}
 
 \subsection{TaskExecutor}
 
-Dopo una fase iniziale di attesa(TODO SPIEGARE MEGLIO) il drone passa in modalit\`a decollo. Questo pu\`o avvenire tramite un iniziale decollo verticale e un successivo volo quasi orizzontale verso il target, oppure tramite un decollo diretto.
-La fase di decollo \`e governata tramite un audit dei droni nelle vicinanze per dare priorit\`a al decollo dei droni con ID pi\`u alto.
+Un riassunto dell'implementazione del TaskExecutor \`e osservabile in figura \ref{png:task-executor}.
+
+\subsubsection{Preparazione e Decollo}
+Dopo una fase iniziale di attesa (si attendono 20 tick in attesa che il TaskAllocator prenda le sue decisioni circa il target da perseguire) il drone passa in modalit\`a decollo. La fase di volo pu\`o avvenire tramite un iniziale decollo verticale e un successivo volo quasi orizzontale verso il target, oppure tramite un decollo diretto che utilizza il vettore di movimento diretto verso il target per prendere quota.
+Il decollo \`e governato dall'esecutore tramite un audit dei droni nelle vicinanze per dare priorit\`a al decollo dei droni con ID pi\`u alto.
+
+\subsubsection{Volo}
 Un drone che ha raggiunto la quota di volo o che decolla direttamente deve eseguire un algoritmo che permette allo stesso di volare in direzione del target ma anche di evitare gli altri droni che ostacolano il percorso.
 Questo \`e fatto tramite l'applicazione di forze repulsive tra droni, in particolare due potenziali che sono stati implementati sono: \textbf{GP} \`e un potenziale ispirato dalla gravit\`a, \textbf{LP} \`e derivato dal potenziale di Lennard Jones.
 
+\subsubsection{Criterio di Arresto}
 Come detto in precedenza, l'esecutore misura la differenza tra la posizione rilevata correntemente e quella rilevata nel tick precedente, la utilizza per stabilire la velocit\`a con cui si \`e mosso il drone in precedenza e in base alla magnitudine di essa decide se \`e fermo o quasi fermo.
 In particolare noi consideriamo fermo un drone la cui velocit\`a istantanea \`e inferiore a $10e-4$.
 
+\subsubsection{Rumore Desiderato}
 Infine abbiamo cosiderato la possibilit\`a di introdurre del rumore nel vettore della velocit\`a desiderata dall'esecutore per creare dell'instabilit\`a sufficiente a smuovere alcune situazioni di stallo nel volo dei droni che si potrebbero creare (ad esempio quando due droni vogliono andare nella stessa direzione ma nel verso opposto).
 Per realizzare ci\`o \`e fondamentale valutare l'impatto del coefficiente di rumore per evitare che l'instabilit\`a sia tale da non permettere alla simulazione di convergere.
+
+\putimage{images/task-executor.png}{Comportamento del Task Executor}{png:task-executor}{0.99}
 
 \section{Risultati}
 

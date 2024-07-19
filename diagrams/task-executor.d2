@@ -1,0 +1,18 @@
+direction: right
+
+P_0: Start
+P_N: End
+
+P_1: Take Off
+P_2: Flight
+P_3: Move Towards Target
+P_4: Avoid Collisions with Potential
+
+P_0 -> P_1
+P_1 -> P_2: Vertical
+P_1 -> P_2: Direct
+P_2 -> P_3 -> P_4
+P_4 -> P_2: LP
+P_4 -> P_2: GP
+
+P_2 -> P_N: Near Steady
