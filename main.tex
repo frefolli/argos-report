@@ -125,7 +125,7 @@
 
 \section{Introduzione}
 
-La \textbf{Swarm Robotics} \`e un filone di ricerca della robotica che si occupa di costruire sistemi intelligenti formati da una moltitudine di droni/robot indipendenti eventualmente eterogenei (detto sciame) per raggiungere tramite algoritmi fortemente decentralizzati un obiettivo di collettivo interesse.
+La \textbf{Swarm Robotics} \`e un filone di ricerca della robotica che si occupa di costruire sistemi intelligenti formati da una moltitudine di droni/robot indipendenti eventualmente eterogenei (detto sciame) per raggiungere tramite algoritmi fortemente decentralizzati un obiettivo di interesse collettivo.
 Le applicazioni della Swarm Robotics spaziano in campo civile e militare.
 Solitamente la ricerca si concentra su scenari che prevedono il salvataggio di persone (Search and Rescure), la ricognizione di un ambiente, o l'impiego operativo in battaglia.
 Gli alroritmi di Swarm Robotics possono anche avere ispirazione biologica\cite{mclurkin2005dynamic}.
@@ -134,7 +134,7 @@ Per la realizzazione di questi esperimenti sono stati costruiti diversi simulato
 
 L'obiettivo del progetto \`e simulare uno sciame di droni volanti il cui scopo \`e:
 \begin{enumerate}
-  \item dividersi in squadroni
+  \item dividersi in squadroni (partizioni dell'insieme di droni)
   \item decollare
   \item raggiungere gli obiettivi sparsi nell'ambiente, evitando collisioni con altri droni durante il volo.
 \end{enumerate}
@@ -163,7 +163,7 @@ In figura \ref{png:simulation-model} si riporta lo schema logico dei componenti 
 Il \textit{cervello} del drone \`e suddiviso in due emisferi: un \textbf{TaskAllocator} che si occupa di decidere a quale target deve mirare (e quindi dove andare), un \textbf{TaskExecutor} che esegue questa volont\`a decidendo come raggiungere gli obiettivi del drone e come evitare intoppi (per esempio collisioni).
 Entrambi questi componenti fanno uso di un \textbf{Random Number Generator}, del \textbf{Positioning Sensor} (che fornisce informazioni circa il proprio orientamento e il proprio posizionamento nell'ambiente) e un \textbf{Range And Bearing Sensor}.
 
-Il \textit{Range and Bearing} \`rappresenta un antenna radio che permette di inviare e ricevere segnali. Questo viene fatto all'interno di ARGoS tramite un buffer di memoria dalla dimensione prefissata (\textit{RAB\_size}) all'inizio della simulazione.
+Il \textit{Range and Bearing} rappresenta un antenna radio che permette di inviare e ricevere segnali. Questo viene fatto all'interno di ARGoS tramite un buffer di memoria dalla dimensione prefissata (\textit{RAB\_size}) all'inizio della simulazione.
 Il sensore \textit{riceve} questi segnali da una distanza massima prefissata (\textit{RAB\_range}), e fornisce al controllore che li processa sia il contenuto del messaggio (\textit{Data}), sia la distanza da cui \`e stato percepito (\textit{Range}) e l'orientamento locale al sistema di riferimento del drone da cui proviene (\textit{HorizontalBearing e VerticalBearing}).
 Per non complicare troppo il modello si \`e deciso di impostare il \textit{RAB\_range} ad un valore sufficiente per consentire a tutti i droni di ricevere tutti i segnali da ogni parte dell'Arena.
 Per come \`e stato implementato in ARGoS non \`e possibile aggiornare lo stato dell'attuatore solo quando cambia uno stato locale ma \`e necessario scrivere un valore ogni volta. % (poteva essere implementato in modo pi\`u performante).
@@ -171,7 +171,7 @@ Dei dati che devono essere scritti sull'attuatore se ne occupa il Controller, il
 
 Sia il TaskAllocator che il TaskExecutor possiedono uno stato che comanda il loro agire, in particolare in base alle esigenze della simulazione gli stati pozzo (\textit{Idle} e \textit{Arrived}) possono essere utilizzati per terminare la simulazione.
 Di base essa termina solo quando tutti i droni \textit{ritengono} di aver finito il compito. Questo pu\`o avvenire in seguito al superamento del numero massimo di iterazioni (\textit{MAX\_ITERATION}), oppure quando il TaskExecutor rileva di essere rimasto \textit{fermo} (o \textit{quasi fermo} oltre una certa soglia di trascurabilit\`a), oppure nel caso in cui si necessita che il TaskAllocator termini dopo aver superato una fase di definizione del target da perseguire.
-Quest'ultimo scenario \`e utile nel caso si voglia valutare vuole valutare solo l'operato di diverse strategie di allocazione delle attivit\`a, (attuate queste si termina la simulazione prematuramente).
+Quest'ultimo scenario (non sfruttato nelle nostre analisi) \`e utile nel caso si voglia valutare vuole valutare solo l'operato di diverse strategie di allocazione delle attivit\`a, (attuate queste si termina la simulazione prematuramente).
 
 
 \paragraph{Codice Sorgente}
@@ -196,13 +196,13 @@ Ogni drone, dopo una fase iniziale di scelta del target si pu\`o decidere di con
 
 \subsubsection{Fase di revisione della scelta del Target}
 Durante le fasi di revisione, è possibile cambiare il proprio target solo se il proprio squadrone ha troppi droni assegnati rispetto a quanti ne dovrebbe avere.
-Nel caos in cui per un drone sia possibile cambiare il prprio target, abbiamo creato due  strategie possibile che può adottare:
+Nel caso in cui per un drone sia possibile cambiare il prprio target, abbiamo creato due  strategie possibile che può adottare:
 \begin{enumerate}
     \item cambio squadrone scegliendone uno a caso
     \item cambio squadrone scegliendo quello più bisognoso di droni.
 \end{enumerate}
 
-La rilocazione, nel caso in qui in mio squadrone sia  pu\`o avvenire sempre o con una certa probabilit\`a. Questa governa sia la probabilit\`a che la distribuzione di droni negli squadroni diventi pi\`u equa sia il numero di cambi che vengono effettuati (rendendo pi\`u instabile lo stato globale).
+La rilocazione, possibile solo nel caso in qui in mio squadrone sia in eccesso di droni,  pu\`o avvenire certamente o avvenire con una certa probabilit\`a. Questa governa sia la probabilit\`a che la distribuzione di droni negli squadroni diventi pi\`u equa sia il numero di cambi che vengono effettuati (rendendo pi\`u instabile lo stato globale).
 
 \putimage{images/task-allocator.png}{Comportamento del Task Allocator}{png:task-allocator}{0.99}
 
@@ -211,7 +211,7 @@ La rilocazione, nel caso in qui in mio squadrone sia  pu\`o avvenire sempre o co
 Un riassunto dell'implementazione del TaskExecutor \`e osservabile in figura \ref{png:task-executor}.
 
 \subsubsection{Preparazione e Decollo}
-Dopo una fase iniziale di attesa (si attendono 20 tick in attesa che il TaskAllocator prenda le sue decisioni circa il target da perseguire) il drone passa in modalit\`a decollo. La fase di volo pu\`o avvenire tramite un iniziale decollo verticale e un successivo volo quasi orizzontale verso il target, oppure tramite un decollo diretto che utilizza il vettore di movimento diretto verso il target per prendere quota.
+Dopo una fase iniziale di attesa (si attendono MAX\_REVIEWING\_SESSIONS=20 tick in attesa che il TaskAllocator prenda le sue decisioni circa il target da perseguire) il drone passa in modalit\`a decollo. La fase di volo pu\`o avvenire tramite un iniziale decollo verticale e un successivo volo quasi orizzontale verso il target, oppure tramite un decollo diretto che utilizza il vettore di movimento diretto verso il target per prendere quota.
 Il decollo \`e governato dall'esecutore tramite un audit dei droni nelle vicinanze per dare priorit\`a al decollo dei droni con ID pi\`u alto.
 
 \subsubsection{Volo}
