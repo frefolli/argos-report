@@ -5,6 +5,9 @@ main.pdf: main.tex
 	bibtex main.aux
 	pdflatex main.tex
 
+lvim:
+	lvim main.tex
+
 send: main.pdf
 	mv main.pdf ~/Desktop/argos-report.pdf
 

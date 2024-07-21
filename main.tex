@@ -188,13 +188,20 @@ Infine si \`e fatto uso di una versione modifica di ARGoS per correggere alcuni 
 
 Un riassunto dell'implementazione del TaskAllocator \`e osservabile in figura \ref{png:task-allocator}.
 
+\subsubsection{Letteratura}
+
+La maggior parte dei paper consultati consigliano approcci dove dopo una scelta iniziale (randomica, secondo qualche criterio di vicinanza .. etc) i droni comunicano direttamente o ascoltando le intenzioni dei vicini e prendono delle decisioni su base probabilisica per distribuire uniformemente i droni nei \textit{task} da effettuare.
+Di conseguenza le nostre implementazioni si sono basate su queste idee generali. Nel nostro caso il task \`e approcciare uno dei target.
+
 \subsubsection{Scelta iniziale del Target}
+
 Ogni drone all'inizio della simulazione sceglie un target iniziale, questo pu\`o essere fatto scegliendo un target a caso o prendendo il pi\`u vicino.
 Il secondo approccio punta a minimizzare le disanze, ma il secondo (se la distribuzione \`e uniforme) tende a minimizzare la varianza delle grandezze degli squadroni.
 Si ricorda che ogni squadrone \`e definito come i droni che agganciano un target.
 Ogni drone, dopo una fase iniziale di scelta del target si pu\`o decidere di considerare l'allocazione terminata (per lui) senza ulteriori modifiche o di eseguire qualche iterazione di un algoritmo decentralizzato che tenti equilibrare le composizioni degli squadroni. 
 
 \subsubsection{Fase di revisione della scelta del Target}
+
 Durante le fasi di revisione, è possibile cambiare il proprio target solo se il proprio squadrone ha troppi droni assegnati rispetto a quanti ne dovrebbe avere.
 Nel caso in cui per un drone sia possibile cambiare il prprio target, abbiamo creato due  strategie possibile che può adottare:
 \begin{enumerate}
@@ -210,11 +217,18 @@ La rilocazione, possibile solo nel caso in qui in mio squadrone sia in eccesso d
 
 Un riassunto dell'implementazione del TaskExecutor \`e osservabile in figura \ref{png:task-executor}.
 
+\subsubsection{Letteratura}
+
+Molti paper consigliano come algoritmo generale un sistema basato su \textit{forze} dove un drone risente di un'attrazione verso un punto di interesse e di una repulsione nei confronti degli altri droni.
+Generalmente la magnitudine della forza di repulsione \`e governata da un \textit{potenziale}, mentre c'\`e pi\`u libert\`a sul come implementare la forza di attrazione.
+
 \subsubsection{Preparazione e Decollo}
+
 Dopo una fase iniziale di attesa (si attendono MAX\_REVIEWING\_SESSIONS=20 tick in attesa che il TaskAllocator prenda le sue decisioni circa il target da perseguire) il drone passa in modalit\`a decollo. La fase di volo pu\`o avvenire tramite un iniziale decollo verticale e un successivo volo quasi orizzontale verso il target, oppure tramite un decollo diretto che utilizza il vettore di movimento diretto verso il target per prendere quota.
 Il decollo \`e governato dall'esecutore tramite un audit dei droni nelle vicinanze per dare priorit\`a al decollo dei droni con ID pi\`u alto.
 
 \subsubsection{Volo}
+
 Un drone che ha raggiunto la quota di volo o che decolla direttamente deve eseguire un algoritmo che permette allo stesso di volare in direzione del target ma anche di evitare gli altri droni che ostacolano il percorso.
 Questo \`e fatto tramite l'applicazione di forze repulsive tra droni, in particolare due potenziali che sono stati implementati sono: \textbf{GP e JP} sono due potenziali ispirati dalla gravit\`a, \textbf{LP} \`e derivato dal potenziale di Lennard Jones.
 
@@ -313,7 +327,36 @@ Da questo si inferisce come il primo metodo sia meno soggetto al rumore e quindi
 
 \subsection{TaskAllocator}
 
-\section{Conclusione}
+Il secondo ciclo di simulazioni riguarda le strategia di Task Allocation, nello specifico in combinazione con un Task Executor con potenziale LP, decollo diretto e senza rumore (si \`e visto nella sezione precedente come minimizza il tempo di esecuzione mantenendo regolari le distanze tra droni).
+Nelle figure \ref{png:task-allocator-nearest-MeanDistanceFromTarget} e \ref{png:task-allocator-random-MeanDistanceFromTarget} si osserva come la strategia di scelta iniziale \textbf{Nearest} minimizzi le distanze che i singoli droni devono percorrere, ed in generale se i target vengono assegnati in base alla vicinanza i droni si aggregeranno con i loro vicini.
+
+\putimagecouple
+{\putsubimage{images/experiments/task-allocator-nearest/MeanDistanceFromTarget.png}{Distanza media dal target nel tempo con scelta iniziale Nearest}{png:task-allocator-nearest-MeanDistanceFromTarget}{0.4}{0.99}}
+{\putsubimage{images/experiments/task-allocator-random/MeanDistanceFromTarget.png}{Distanza media dal target nel tempo con scelta iniziale Random}{png:task-allocator-random-MeanDistanceFromTarget}{0.4}{0.99}}
+
+Nel momento in cui vengono effettuati dei cambi (figura \ref{png:task-allocator-nearest-shortened-MeanDistanceFromTarget}) la distanza media aumenta, ma solo nel caso di Nearest. Se la scelta iniziale era randomica (figura \ref{png:task-allocator-random-shortened-MeanDistanceFromTarget}) c'\`e la possibilit\`a che il nuovo equilibrio abbia squadroni pi\`u compatti.
+
+Parlando dei cambi di target, si osserva come il criterio che obbliga il drone ad adottare il target meno popolato quando il proprio \`e in eccesso aiuta a ridurre la varianza di presenza dei droni nei target (figura \ref{png:task-allocator-random-shortened-VarTargetDensityOverTime}), ma solo se la probabilit\`a di cambiare \`e contenuta, altrimenti si comporta come il criterio di cambio a squadrone randomico (figura \ref{png:task-allocator-random-always-VarTargetDensityOverTime}).
+Questo accade perch\`e pi\`u \`e alta la probabilit\`a di cambio pi\`u droni decideranno di cambiare target, e se il target in questione non \`e randomico ma sempre lo stesso (quello con meno droni rispetto al necessario) si creeranno forti sbilanciamenti. In queste condizioni una scelta randomica aiuta a distribuire meglio i droni ma \`e evidente come si possa fare di meglio permettendo a pochi droni (quindi bassa probabilit\`a) di cambiare nello squadrone pi\`u svantaggiato.
+
+\putimagecouple
+{\putsubimage{images/experiments/task-allocator-nearest-shortened/MeanDistanceFromTarget.png}{Distanza media dal target nella fase di allocazione con scelta iniziale Nearest}{png:task-allocator-nearest-shortened-MeanDistanceFromTarget}{0.4}{0.99}}
+{\putsubimage{images/experiments/task-allocator-random-shortened/MeanDistanceFromTarget.png}{Distanza media dal target nella fase di allocazione con scelta iniziale Random}{png:task-allocator-random-shortened-MeanDistanceFromTarget}{0.4}{0.99}}
+
+\putimagecouple
+{\putsubimage{images/experiments/task-allocator-random-shortened/VarTargetDensityOverTime.png}{Distanza media dal target nella fase di allocazione con scelta iniziale random}{png:task-allocator-random-shortened-VarTargetDensityOverTime}{0.4}{0.99}}
+{\putsubimage{images/experiments/task-allocator-random-always/VarTargetDensityOverTime.png}{Distanza media dal target nella fase di allocazione con scelta iniziale Random}{png:task-allocator-random-always-VarTargetDensityOverTime}{0.4}{0.99}}
+
+\section{Limiti del Modello}
+
+\subsection{Criterio di Arresto}
+
+Il criterio di arresto utilizzato dal nostro modello accomoda lo scenario in cui i droni sono arrivati in formazione ma non tiene in considerazione adeguatamente il caso in cui gli stessi finiscano in deadlock.
+In quel caso sarebbero fermi esattamente come nel caso siano realmente arrivati. Per evitare questa eventualit\`a le simulazioni sono state monitorate graficamente per assicurarsi che fossero valide e in aggiunta si \`e sperimentata l'aggiunta di rumore al vettore di velocit\`a passato all'attuatore.
+
+Inoltre quando \`e stato introdotto il decollo diretto, \`e stato necessario modificare l'algoritmo che verifica il criterio per accomodare questo metodo di decollo siccome per come \`e fatto il sistema di accelerazione di ARGoS la differenza di posizione per qualche iterazione era tale da far scattare il criterio di arresto.
+
+\section{Conclusioni}
 
 \printbibliography[title={Bibliografia}]
 
