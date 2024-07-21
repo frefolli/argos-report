@@ -216,7 +216,23 @@ Il decollo \`e governato dall'esecutore tramite un audit dei droni nelle vicinan
 
 \subsubsection{Volo}
 Un drone che ha raggiunto la quota di volo o che decolla direttamente deve eseguire un algoritmo che permette allo stesso di volare in direzione del target ma anche di evitare gli altri droni che ostacolano il percorso.
-Questo \`e fatto tramite l'applicazione di forze repulsive tra droni, in particolare due potenziali che sono stati implementati sono: \textbf{GP} \`e un potenziale ispirato dalla gravit\`a, \textbf{LP} \`e derivato dal potenziale di Lennard Jones.
+Questo \`e fatto tramite l'applicazione di forze repulsive tra droni, in particolare due potenziali che sono stati implementati sono: \textbf{GP e JP} sono due potenziali ispirati dalla gravit\`a, \textbf{LP} \`e derivato dal potenziale di Lennard Jones.
+
+Detta $d$ la distanza tra due corpi soggetti alla forza repulsiva (i droni), $A$ un moltiplicatore specifico di ogni potenziale utilizzato per ottimizzarne l'intensit\`a e $D$ una distanza media che si vuole mantenere tra due droni, si riportano le formule per ricavare le forze di attrazione:
+
+\begin{itemize}
+  \item $GP(d) = -A_{GP} \frac {|D - d|} {d}$
+  \item $JP(d) = -A_{JP} \frac {D - d} {d^2}$
+  \item $GP(d) = -A_{LP} 4 ({\frac {D} {d}}^6 - {\frac {D} {d}}^{12})$
+\end{itemize}
+
+Si riportano anche i valori dei coefficienti $A$ che abbiamo utilizzato:
+
+\begin{itemize}
+  \item $A_{GP} = 4.0$
+  \item $A_{JP} = 16.0$
+  \item $A_{LP} = 0.2$
+\end{itemize}
 
 \subsubsection{Criterio di Arresto}
 Come detto in precedenza, l'esecutore misura la differenza tra la posizione rilevata correntemente e quella rilevata nel tick precedente, la utilizza per stabilire la velocit\`a con cui si \`e mosso il drone in precedenza e in base alla magnitudine di essa decide se \`e fermo o quasi fermo.
@@ -234,9 +250,68 @@ Sono state condotte delle simulazioni con ARGoS variando in ciascuna la strategi
 Si \`e scelto di testare singolarmente il TaskAllocator e il TaskExecutor per ridurre lo spazio delle soluzioni possibili.
 Ogni esecuzione di simulazione genera dei file di Log che vengono scritti dal Controller di ciascun drone e che ci ha permesso di produrre alcune metriche utili nell'analisi.
 
-\subsection{TaskAllocator}
-
 \subsection{TaskExecutor}
+
+In questo primo ciclo di simulazioni abbiamo utilizzato un TaskAllocator \textit{RANDOM\_\_NO\_REVIEW}, ovvero che inizializza i target randomicamente senza attuare cambi.
+Questo perch\`e in questa fase ci interessa osservare come si comportano le strategie di TaskExecutor a parit\`a di seed e di scenario.
+Quindi si \`e variato sul potenziale utilizzato nella Collision Avoidance, sul metodo di Decollo e sulla presenza o no del rumore.
+
+\subsubsection{Confrontare i Potenziali}
+
+Inizialmente ci siamo concentrati sul decollo verticale e in assenza di rumore sul vettore di velocit\`a dell'attuatore variando solo il potenziale utilizzato.
+In figura \ref{png:task-executor-noiseless-vertical-MeanDistanceFromTarget} \`e riportata la distanza media dei droni del proprio target nel tempo. Si pu\`o notare come i potenziali \textbf{GP/JP} hanno curve di discesa pi\`u ripide e garantiscono una distanza media inferiore rispetto a \textbf{LP}.
+
+\putimage{images/experiments/task-executor-noiseless-vertical/MeanDistanceFromTarget.png}{Distanza media dal target nel tempo}{png:task-executor-noiseless-vertical-MeanDistanceFromTarget}{0.99}
+
+Da questo si pu\`o inferire come in quest'ultimo la formazione di uno squadrone sia meno compatta, e in figura \ref{png:task-executor-noiseless-vertical-MeanDistancesWithinSquadron} si osserva proprio questo.
+In generale \textbf{LP} da la possibilit\`a di fissare una distanza minima per i droni e di rispettarla. Lo stesso non vale per gli altri due potenziali, nonostante \textbf{JP} tenda al rialzo verso la distanza istruita.
+Questa pu\`o essere vista come un'arma a doppio taglio: certamente si possono aggregare i droni pi\`u vicino al target ma le distanze intra-squadrone sono pi\`u corte e il rischio di collisioni accidentali pu\`o aumentare significativamente.
+
+\putimage{images/experiments/task-executor-noiseless-vertical/MeanDistancesWithinSquadron.png}{Distanza media dai droni dello stesso squadrone nel tempo}{png:task-executor-noiseless-vertical-MeanDistancesWithinSquadron}{0.99}
+
+Ulteriore evidenza di ci\`o si ottiene dalla figura \ref{png:task-executor-noiseless-vertical-MinDistancesGlobally}, che mostra la minima distanza istantanea tra droni (calcolata globalmente, indipendentemente dallo squadrone).
+
+\putimage{images/experiments/task-executor-noiseless-vertical/MinDistancesGlobally.png}{Distanza minima tra droni nel tempo}{png:task-executor-noiseless-vertical-MinDistancesGlobally}{0.99}
+
+LP \`e un potenziale pi\`u \textit{reattivo} nella misura in cui a distanze pi\`u basse \`e in grado di applicare una forza di separazione maggiore. Gli altri due sono pi\`u rilassati, quindi anche se complessivamente la distanza minima tende in ultima istanza ad essere non di molto inferiore a quella di LP, specie in fase di decollo dei droni possiamo avere diverse occasioni di collisione.
+In particolare i valori sotto lo \textit{0.5} (diametro di un drone) si spiegano col fatto che un drone gi\`a decollato potrebbe stare sorvolando un drone in fase di ascesa senza per\`o mai sfiorarlo (l'altezza di un drone \`e incisiva in questo senso).
+
+\subsubsection{Decollo Diretto}
+
+Vediamo ora cosa succede se permettiamo ai droni di saltare la fase di ascesa verticale iniziale e quindi di decollare direttamente nella direzione del target.
+In figure \ref{png:task-executor-noiseless-vertical-MeanSpeed} e \ref{png:task-executor-noiseless-direct-MeanSpeed} sono riportate le medie delle velocit\`a impresse dai droni sugli attuatori nel caso di decollo verticale e diretto.
+L'effetto principale che possiamo osservare \`e una diminuzione del tempo totale di formazione dovuto al fatto che il tempo medio di attesa per il decollo dei droni vicini \`e molto pi\`u basso (dovendo aspettare una generica partenza invece che il raggiungimento di una quota).
+Inoltre, nonostante si raggiunga una velocit\`a media pi\`u alta nel caso del decollo diretto, si deve notare che la curva si rilassa pi\`u in fretta (ovvero i droni rallentano molto pi\`u velocemente) permettendo quindi complessivamente di risparmiare energia.
+
+\putimagecouple
+{\putsubimage{images/experiments/task-executor-noiseless-vertical/MeanSpeed.png}{Velocit\`a media voluta dai droni nel tempo con Decollo Verticale}{png:task-executor-noiseless-vertical-MeanSpeed}{0.4}{0.99}}
+{\putsubimage{images/experiments/task-executor-noiseless-direct/MeanSpeed.png}{Velocit\`a media voluta dai droni nel tempo con Decollo Diretto}{png:task-executor-noiseless-direct-MeanSpeed}{0.4}{0.99}}
+
+Nelle figure \ref{png:task-executor-noiseless-vertical-MinDistancesGlobally} e \ref{png:task-executor-noiseless-direct-MinDistancesGlobally} si riportano affiancate le distanze minime nei due metodi di decollo.
+Il decollo verticale \`e un'arma a doppio taglio perch\`e le distanze minime tra droni calano sensibilmente aumentando il rischio di collisioni.
+In questo senso risulta fondamentale un potenziale reattivo (come LP) che possa separare fortemente i droni in volo.
+
+\putimagecouple
+{\putsubimage{images/experiments/task-executor-noiseless-vertical/MinDistancesGlobally.png}{Distanza minima tra droni nel tempo con Decollo Verticale}{png:task-executor-noiseless-vertical-MinDistancesGlobally}{0.4}{0.99}}
+{\putsubimage{images/experiments/task-executor-noiseless-direct/MinDistancesGlobally.png}{Distanza minima tra droni nel tempo con Decollo Diretto}{png:task-executor-noiseless-direct-MinDistancesGlobally}{0.4}{0.99}}
+
+\subsubsection{Aggiunta di Rumore}
+
+Come detto precedente il rumore \`e aggiunto in fase di attuazione del moto principalmente per aggiungere non determinismo in modo da smuovere alcune situazioni di deadlock, ma \`e anche utile per modellare un sistema a pi\`u alto realismo in cui i motori del drone non sono perfetti e aggiungono un difetto al modo misurabile come rumore.
+L'instabilit\`a creata dal rumore rende le simulazioni pi\`u lunghe perch\`e \`e pi\`u difficile raggiungere una condizione di equilibrio, per\`o converge e gli andamenti delle metriche mostrate in precedenza si ripresentano invariati (al netto della distorsione data dal rumore).
+Sebbene si possano evitare deadlock pi\`u facilmente (\`e stato osservato sperimentalmente che in assenza di rumore \`e possibile che due droni rimangano fermi uno davanti all'altro), il tempo di esecuzione \`e quasi raddoppiato, determinando quindi un consumo energetico maggiore.
+
+In sostanza, nel caso il rumore sia aggiunto volontariamente, la sua magnitudine deve essere commisurata al vantaggio che si ottiene dal non determinismo rispetto allo svantaggio in termini di tempo ed energia.
+Nel caso invece in cui il rumore sia non trascurabile \`e risulta pi\`u vantaggioso scegliere il metodo di decollo che garantisce minor consumo di carburante in base alla magnitudine del rumore.
+Nelle figure \ref{png:task-executor-noisy-vertical-MeanSpeed} e \ref{png:task-executor-noisy-direct-MeanSpeed} si riportano le velocit\`a medie dei droni nello scenario con rumore.
+Si osserva (facendo il confronto con le figure \ref{png:task-executor-noiseless-vertical-MeanSpeed} e \ref{png:task-executor-noiseless-direct-MeanSpeed}) come i metodi basati sul decollo verticale garantiscano tempi inferiori rispetto al decollo diretto.
+Da questo si inferisce come il primo metodo sia meno soggetto al rumore e quindi da preferire nel caso di sistema molto rumoroso.
+
+\putimagecouple
+{\putsubimage{images/experiments/task-executor-noisy-vertical/MeanSpeed.png}{Velocit\`a media voluta dai droni nel tempo con Decollo Verticale e Rumore}{png:task-executor-noisy-vertical-MeanSpeed}{0.4}{0.99}}
+{\putsubimage{images/experiments/task-executor-noisy-direct/MeanSpeed.png}{Velocit\`a media voluta dai droni nel tempo con Decollo Diretto e Rumore}{png:task-executor-noisy-direct-MeanSpeed}{0.4}{0.99}}
+
+\subsection{TaskAllocator}
 
 \section{Conclusione}
 
