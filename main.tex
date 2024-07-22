@@ -341,7 +341,7 @@ Anche sotto il profilo del consumo energetico Decollo Verticale è meglio di Dec
 
 Il secondo ciclo di simulazioni riguarda le strategia di Task Allocation, nello specifico in combinazione con un Task Executor con potenziale LP, decollo diretto e senza rumore (si \`e visto nella sezione precedente come minimizza il tempo di esecuzione mantenendo regolari le distanze tra droni).
 Nelle figure \ref{png:task-allocator-nearest-MeanDistanceFromTarget} e \ref{png:task-allocator-random-MeanDistanceFromTarget} si osserva come la strategia di scelta iniziale \textbf{Nearest} faccia ottenere  distanze da percorrere dai singoli droni pi\`u corte rispetto quanto fa l'inizializzazione Random. 
-Sempre su questo tema, un iniziaizzazione Nearest con mancanza di review successiva, fa raggiunege il minimo globale per quanto riguarda la distanza media che ogni drone deve percorrere, dato che dopo 200 iterazioni circa i droni sono gi\`a arrivati a destinazione.
+Sempre su questo tema, un iniziaizzazione Nearest con mancanza di review successiva, fa raggiunegere il minimo globale per quanto riguarda la distanza media che ogni drone deve percorrere, dato che dopo 200 iterazioni circa i droni sono gi\`a arrivati a destinazione.
 
 \putimagecouple
 {\putsubimage{images/experiments/task-allocator-nearest/MeanDistanceFromTarget.png}{Distanza media dal target nel tempo con scelta iniziale Nearest}{png:task-allocator-nearest-MeanDistanceFromTarget}{0.4}{0.99}}
@@ -415,7 +415,7 @@ Inoltre quando \`e stato introdotto il decollo diretto, \`e stato necessario mod
 
 \section{Conclusioni}
 
-Sono state eseguite diverse simulazioni che hanno evidenziato aspetto positivi e negativi delle strategie implementate, rispetto anche a diversi scenari (rumore si/rumore no, e un potenziale tra LP, GP e JP).
+Sono state eseguite diverse simulazioni che hanno evidenziato aspetti positivi e negativi delle strategie implementate, rispetto anche a diversi scenari (rumore si/rumore no, e un potenziale tra LP, GP e JP).
 
 I droni possono implementare una strategia di selezione del target iniziale tra: una scelta casuale("strategia Nearest") o la scelta del target pi\`u vicino ("Random"). Fatta questa scelta, essa pu\`o essere messa in discussione o no, farlo significa che per un certo numero di iterazioni si valuta se il target attuale ha un numero eccessivo di droni assegani a lui o no. Se ha troppi droni assegnati,  pu\`o, con una certa probabilit\`a,  migrare verso uno squadrone casuale o verso quello con il target pi\`u bisognoso di droni ("strategia Probable Minority").
 
@@ -426,7 +426,7 @@ I droni sono immersi in un ambiente con delle forze di repulsione tra droni, la 
 
 Abbiamo osservato come inizializzare con Nearest i target assegnati ai droni porta a una distanza media da percorrere durante la missione inferiore a quanto farebbe un inizializzazione Random, e a distanze tra droni dello stesso squadrone inferiori al caso Random.
 
-Con asseganmento iniziale Random, vale che per i metodi Probable Minority, tanto più è probabile la rilocazione, tanto pi\`u essi generano squadroni squilibrati nel numero di droni che gli appartengono.
+Con assegnamento iniziale Random, vale che per i metodi Probable Minority, tanto più è probabile la rilocazione, tanto pi\`u essi generano squadroni squilibrati nel numero di droni che gli appartengono.
 
 Abbiamo visto che in sistemi privi di rumore il Decollo Diretto permette di risparmiare eneriga, metre se è presente rumore allora il Decollo Verticale è molto meglio in questo.
 
