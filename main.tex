@@ -374,7 +374,7 @@ Per questa ragione i nostri esperimenti si sono concentrati su simulazioni di al
 
 Inoltre, come detto in precedenza, l'implementazione di ARGoS di alcune feature \`e incompleta, abbozzata o scorretta.
 Per i droni esso mette a disposizione due attuatori, uno basato sulla posizione (riceve in input una posizione e applica sul drone le forze necessarie a spostarlo nella posizione bersaglio) e uno basato sulla velocit\`a (riceve un vettore di velocit\`a e applica delle forze per raggiungere quella velocit\`a).
-Il secondo attuatore, quello che abbiamo usato, non solo non era "allacciato" (non veniva mai chiavata la funzione corrispondente nel drone) ma la sua implementazione prevedeva delle spinte assolutamente insufficienti anche solo per spostarlo.
+Il secondo attuatore, quello che abbiamo usato, non solo non era "allacciato" (non veniva mai chiamata la funzione corrispondente nel drone) ma la sua implementazione prevedeva delle spinte assolutamente insufficienti anche solo per spostarlo.
 Di conseguenza abbiamo dovuto mettere mano al codice per adattare quella parte ad avere almeno la stessa reattivit\`a che possiede l'attuatore per posizione (il quale risultava invece funzionante).
 Il problema di questo aggiustamento risiede principalmente nel fatto che i coefficienti di reattivit\`a applicati sono ricavati in modo empirico, quindi se l'attuatore per posizione potesse vantare un certo grado di fedelt\`a, non si pu\`o dire lo stesso di quello basato su velocit\`a.
 
