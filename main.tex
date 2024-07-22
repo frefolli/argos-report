@@ -351,6 +351,27 @@ Questo accade perch\`e pi\`u \`e alta la probabilit\`a di cambio pi\`u droni dec
 
 \section{Limiti del Modello}
 
+\subsection{ARGoS}
+
+ARGoS ha diversi problemi sia ad inserire molte entit\`a nell'ambiente, sia nel simulare in generale un'arena di grandi dimensioni o un numero grande di droni.
+Per questa ragione i nostri esperimenti si sono concentrati su simulazioni di al massimo 30 droni.
+
+Inoltre, come detto in precedenza, l'implementazione di ARGoS di alcune feature \`e incompleta, abbozzata o scorretta.
+Per i droni esso mette a disposizione due attuatori, uno basato sulla posizione (riceve in input una posizione e applica sul drone le forze necessarie a spostarlo nella posizione bersaglio) e uno basato sulla velocit\`a (riceve un vettore di velocit\`a e applica delle forze per raggiungere quella velocit\`a).
+Il secondo attuatore, quello che abbiamo usato, non solo non era "allacciato" (non veniva mai chiavata la funzione corrispondente nel drone) ma la sua implementazione prevedeva delle spinte assolutamente insufficienti anche solo per spostarlo.
+Di conseguenza abbiamo dovuto mettere mano al codice per adattare quella parte ad avere almeno la stessa reattivit\`a che possiede l'attuatore per posizione (il quale risultava invece funzionante).
+Il problema di questo aggiustamento risiede principalmente nel fatto che i coefficienti di reattivit\`a applicati sono ricavati in modo empirico, quindi se l'attuatore per posizione potesse vantare un certo grado di fedelt\`a, non si pu\`o dire lo stesso di quello basato su velocit\`a.
+
+\subsection{Forze di Separazione}
+
+Il sistema anti collisione che genera le forze prende in considerazione sono una separazione sul piano orizzontale ma per calcolare l'intensit\`a utilizza una distanza in 3 dimensioni.
+Questo perch\`e il modo con cui ARGoS gestisce le rotazioni (specie nei confronti del drone) non \`e del tutto chiaro e includendo anche la direzione verticale si producevano delle interazioni inconcludenti che sbalzano i droni fuori dalla rotta senza motivo.
+
+\subsection{Modellazione delle Collisioni}
+
+In generale le collisioni sono modellate come riduzione della distanza tra due droni oltre la soglia minima (diametro di un drone), infatti i droni sono stati pensati come dischi circolari di altezza molto ridotta, ma non abbiamo quantificato questa altezza che potrebbe essere critica per definire le collisioni in aria (per esempio se un drone sorvola un drone in ascesa).
+Se due droni collidono non \`e stato definito un comportamento specifico: nella realt\`a due droni che collidono a bassa velocit\`a ricevono un urto non sufficiente ad abbatterli, ma questo pu\`o dipendere anche dalla superficie di impatto (se per esempio l'urto avviene su un rotore) o dalla reattivit\`a/fragilit\`a strutturale dei droni stessi.
+
 \subsection{Criterio di Arresto}
 
 Il criterio di arresto utilizzato dal nostro modello accomoda lo scenario in cui i droni sono arrivati in formazione ma non tiene in considerazione adeguatamente il caso in cui gli stessi finiscano in deadlock.
