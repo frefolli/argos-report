@@ -139,7 +139,7 @@ L'obiettivo del progetto \`e simulare uno sciame di 20 droni volanti il cui scop
   \item raggiungere i 5 obiettivi sparsi nell'ambiente, evitando collisioni con altri droni durante il volo.
 \end{enumerate}
 
-Gli obiettivi sono generati randomicamente usando una distribuzione uniforme sulle 3 componenti spaziali, i cui limiti sono gli stessi dei droni e dell'arena.
+Gli la collocazione degli obiettivi è stata generati casualmente usando una distribuzione uniforme sulle 3 componenti spaziali, i cui limiti sono gli stessi dei droni e dell'arena.
 Una partizione \`e considerata \textit{buona} se la distribuzione dei droni sugli obiettivi \`e uniforme, ovvero se la varianza del numero di droni per squadrone \`e bassa.
 
 Per la simulazione ci siamo avvalsi di ARGoS \cite{Pinciroli:SI2012}, un simulatore programmabile Free and Open Source.
@@ -387,6 +387,13 @@ Questo perch\`e il modo con cui ARGoS gestisce le rotazioni (specie nei confront
 
 In generale le collisioni sono modellate come riduzione della distanza tra due droni oltre la soglia minima (diametro di un drone), infatti i droni sono stati pensati come dischi circolari di altezza molto ridotta, ma non abbiamo quantificato questa altezza che potrebbe essere critica per definire le collisioni in aria (per esempio se un drone sorvola un drone in ascesa).
 Se due droni collidono non \`e stato definito un comportamento specifico: nella realt\`a due droni che collidono a bassa velocit\`a ricevono un urto non sufficiente ad abbatterli, ma questo pu\`o dipendere anche dalla superficie di impatto (se per esempio l'urto avviene su un rotore) o dalla reattivit\`a/fragilit\`a strutturale dei droni stessi.
+
+
+\subsection{Generalit\`a}
+Avendo fissato il numero di droni, di target e il seed che determina le posizioni di droni e target, i nostri esperimenti possono essere criticati per mancanza di generalità. I risultati tratti da questi sono riferiti a uno scenario con 20 droni, 5 target e 5 droni richiiesti da ogni target, e ad una certa disposizione spaziale di target e droni, e per dimostrare che questi sono applicabili a scenari dove variano queste caratteristiche, bisognerebbe fare più esperimenti dove si varia diversi valori di queste variabili.
+
+Ad onor del vero, prima di raggiungere questo setup sperimentale finale abbiamo usato anche provato con seed diversi ad ogni esperimento (quindi la disposizione di droni e target cambia), per poi fare la media di 10 simulazioni per ogni strategia analizzata, e i risultati non sono stati poi così diversi.
+
 
 \subsection{Criterio di Arresto}
 
