@@ -132,12 +132,14 @@ Gli alroritmi di Swarm Robotics possono anche avere ispirazione biologica\cite{m
 
 Per la realizzazione di questi esperimenti sono stati costruiti diversi simulatori e qualche framework fisico per l'implementazione di sciami omogenei di robot.
 
-L'obiettivo del progetto \`e simulare uno sciame di droni volanti il cui scopo \`e:
+L'obiettivo del progetto \`e simulare uno sciame di 20 droni volanti il cui scopo \`e:
 \begin{enumerate}
-  \item dividersi in squadroni (partizioni dell'insieme di droni)
+  \item dividersi in 5 squadroni (partizioni dell'insieme di droni)
   \item decollare
-  \item raggiungere gli obiettivi sparsi nell'ambiente, evitando collisioni con altri droni durante il volo.
+  \item raggiungere i 5 obiettivi sparsi nell'ambiente, evitando collisioni con altri droni durante il volo.
 \end{enumerate}
+
+Una partizione \`e considerata \textit{buona} se la distribuzione dei droni sugli obiettivi \`e uniforme, ovvero se la varianza del numero di droni per squadrone \`e bassa.
 
 
 Per la simulazione ci siamo avvalsi di ARGoS \cite{Pinciroli:SI2012}, un simulatore programmabile Free and Open Source.
@@ -171,8 +173,7 @@ Dei dati che devono essere scritti sull'attuatore se ne occupa il Controller, il
 
 Sia il TaskAllocator che il TaskExecutor possiedono uno stato che comanda il loro agire, in particolare in base alle esigenze della simulazione gli stati pozzo (\textit{Idle} e \textit{Arrived}) possono essere utilizzati per terminare la simulazione.
 Di base essa termina solo quando tutti i droni \textit{ritengono} di aver finito il compito. Questo pu\`o avvenire in seguito al superamento del numero massimo di iterazioni (\textit{MAX\_ITERATION}), oppure quando il TaskExecutor rileva di essere rimasto \textit{fermo} (o \textit{quasi fermo} oltre una certa soglia di trascurabilit\`a), oppure nel caso in cui si necessita che il TaskAllocator termini dopo aver superato una fase di definizione del target da perseguire.
-Quest'ultimo scenario (non sfruttato nelle nostre analisi) \`e utile nel caso si voglia valutare vuole valutare solo l'operato di diverse strategie di allocazione delle attivit\`a, (attuate queste si termina la simulazione prematuramente).
-
+Quest'ultimo scenario (non sfruttato nelle nostre analisi) \`e utile nel caso in cui si voglia valutare solo l'operato di diverse strategie di allocazione delle attivit\`a, (attuate queste si termina la simulazione prematuramente).
 
 \paragraph{Codice Sorgente}
 
@@ -190,7 +191,7 @@ Un riassunto dell'implementazione del TaskAllocator \`e osservabile in figura \r
 
 \subsubsection{Letteratura}
 
-La maggior parte dei paper consultati consigliano approcci dove dopo una scelta iniziale (randomica, secondo qualche criterio di vicinanza .. etc) i droni comunicano direttamente o ascoltando le intenzioni dei vicini e prendono delle decisioni su base probabilisica per distribuire uniformemente i droni nei \textit{task} da effettuare.
+La maggior parte dei paper consultati consigliano approcci dove dopo una scelta iniziale (randomica, secondo qualche criterio di vicinanza .. etc) i droni comunicano direttamente o ascoltando le intenzioni dei vicini e prendono delle decisioni su base probabilistica per distribuire uniformemente i droni nei \textit{task} da effettuare.
 Di conseguenza le nostre implementazioni si sono basate su queste idee generali. Nel nostro caso il task \`e approcciare uno dei target.
 
 \subsubsection{Scelta iniziale del Target}
@@ -281,15 +282,16 @@ Si pu\`o notare come i potenziali \textbf{GP/JP} hanno curve di discesa pi\`u ri
 Da questo si pu\`o inferire come con LP la formazione di uno squadrone sia meno compatta (in figura \ref{png:task-executor-noiseless-vertical-MeanDistancesWithinSquadron} si osserva proprio questo).
 In generale \textbf{LP} d\`a la possibilit\`a di fissare una distanza minima per i droni e di rispettarla. Lo stesso non vale per gli altri due potenziali.
 Questa distanza minima tra droni viene mantentuta da LP sia in volo ma anche quando i droni sono assiepati a ridosso del target.
-Questa pu\`o essere vista come un'arma a doppio taglio: certamente le distanze intra-squadrone sono pi\`u grandi e quindi il rischio di collisioni diminuisce significativamente, ma i droni quando arriveranno al target saranno e resteranno più separati tra di loro. A seconda del contesto applicativo, se questo aspetto risulta problematico, si può pensare di disattivare/ridurre le forze di repulsione quando siamo vicini al target
+Questa pu\`o essere vista come un'arma a doppio taglio: certamente le distanze intra-squadrone sono pi\`u grandi e quindi il rischio di collisioni diminuisce significativamente, ma i droni quando arriveranno al target saranno e resteranno più separati tra di loro. A seconda del contesto applicativo, se questo aspetto risulta problematico, si può pensare di disattivare/ridurre le forze di repulsione quando siamo vicini al target.
 
 \putimage{images/experiments/task-executor-noiseless-vertical/MeanDistancesWithinSquadron.png}{Distanza media dai droni dello stesso squadrone nel tempo}{png:task-executor-noiseless-vertical-MeanDistancesWithinSquadron}{0.99}
+
 Vediamo come solo \textbf{LP} riesca a mantenere la distanza inter-drone sopra una soglia fissata.
 
 \putimage{images/experiments/task-executor-noiseless-vertical/MinDistancesGlobally.png}{Distanza minima tra droni nel tempo}{png:task-executor-noiseless-vertical-MinDistancesGlobally}{0.99}
 
 LP \`e un potenziale pi\`u \textit{reattivo} nella misura in cui a distanze pi\`u basse \`e in grado di applicare una forza di separazione maggiore. Gli altri due sono pi\`u rilassati, quindi anche se complessivamente la distanza minima tende in ultima istanza ad essere non di molto inferiore a quella di LP, specie in fase di decollo dei droni possiamo avere diverse occasioni di collisione.
-Ad esempio un drone gi\`a decollato potrebbe star sorvolando un drone in fase di ascesa senza per\`o mai sfiorarlo.
+Le distanze minime per\`o devono essere interpretate con cautela, perch\`e se \`e vero che con GP/JP abbiamo dei picchi negativi in termini di distanza, potrebbe trattarsi di qualche drone gi\`a decollato che sta sorvolando un drone in fase di ascesa senza per\`o mai sfiorarlo.
 
 \subsubsection{Decollo Diretto}
 
@@ -318,11 +320,11 @@ L'instabilit\`a creata dal rumore rende le simulazioni pi\`u lunghe (ad esempio 
 Gli andamenti delle metriche mostrate in precedenza si ripresentano invariati (al netto della distorsione data dal rumore).
 Sebbene si possano evitare deadlock pi\`u facilmente (\`e stato osservato sperimentalmente che in assenza di rumore \`e possibile che due droni rimangano fermi uno davanti all'altro), il tempo di esecuzione \`e quasi raddoppiato, determinando quindi un consumo energetico maggiore.
 In sostanza, nel caso il rumore sia aggiunto volontariamente, la sua magnitudine deve essere commisurata al vantaggio che si ottiene dal non determinismo rispetto allo svantaggio in termini di tempo ed energia.
-Nel caso in cui il rumore significativo risulta pi\`u importante scegliere il metodo di decollo che garantisce minor consumo di carburante.
+Nel caso in cui il rumore sia significativo risulta pi\`u importante scegliere il metodo di decollo che garantisce minor consumo di carburante.
 
 Nelle figure \ref{png:task-executor-noisy-vertical-MeanSpeed} e \ref{png:task-executor-noisy-direct-MeanSpeed} si riportano le velocit\`a medie dei droni nello scenario con rumore.
 Si osserva  come, a differenza dello scenario senza il rumore, i metodi basati sul decollo verticale garantiscano tempi di convergenza inferiori rispetto al decollo diretto (circa 1000 iterazioni per convergere versus 1400).
-Guaradndo per confronto con dei metodi nel caso non-rumoroso le figure \ref{png:task-executor-noiseless-vertical-MeanSpeed} e \ref{png:task-executor-noiseless-direct-MeanSpeed}, si nota che Decollo Verticale senza rumore passa dal convergsre in circa 800 iterazioni a circa 1000 se si considera il rumore; mentre Decollo Diretto passa dal convergsre in 700 iterazioni (senza rumore) a 1400 se si considera il rumore.
+Guardando nel caso non-rumoroso le figure \ref{png:task-executor-noiseless-vertical-MeanSpeed} e \ref{png:task-executor-noiseless-direct-MeanSpeed}, si nota che Decollo Verticale senza rumore passa dal convergere in circa 800 iterazioni a circa 1000 se si considera il rumore; mentre Decollo Diretto passa dal convergere in 700 iterazioni (senza rumore) a 1400 se si considera il rumore.
 Da questo si inferisce come il metodo Decollo Verticale sia meno soggetto al rumore e quindi da preferire nel caso di sistema molto rumoroso.
 Anche sotto il profilo del consumo energetico Decollo Verticale è meglio di Decollo Diretto, poichè ci mette molto meno tempo a convergere.
 
@@ -335,18 +337,16 @@ Anche sotto il profilo del consumo energetico Decollo Verticale è meglio di Dec
 Il secondo ciclo di simulazioni riguarda le strategia di Task Allocation, nello specifico in combinazione con un Task Executor con potenziale LP, decollo diretto e senza rumore (si \`e visto nella sezione precedente come minimizza il tempo di esecuzione mantenendo regolari le distanze tra droni).
 Nelle figure \ref{png:task-allocator-nearest-MeanDistanceFromTarget} e \ref{png:task-allocator-random-MeanDistanceFromTarget} si osserva come la strategia di scelta iniziale \textbf{Nearest} minimizzi le distanze che i singoli droni devono percorrere.
 
-In generale dato che i target vengono assegnati in base alla vicinanza, vale il principio di localit\`a, cio\`e che droni nello stesso squadrone, saranno probabilmente vicini tra di loro, con questo si spiegano i risultati di figura ?????
-
-<figura>
-
 \putimagecouple
 {\putsubimage{images/experiments/task-allocator-nearest/MeanDistanceFromTarget.png}{Distanza media dal target nel tempo con scelta iniziale Nearest}{png:task-allocator-nearest-MeanDistanceFromTarget}{0.4}{0.99}}
 {\putsubimage{images/experiments/task-allocator-random/MeanDistanceFromTarget.png}{Distanza media dal target nel tempo con scelta iniziale Random}{png:task-allocator-random-MeanDistanceFromTarget}{0.4}{0.99}}
 
+In generale dato che i target vengono assegnati in base alla vicinanza, vale il principio di localit\`a, cio\`e che droni nello stesso squadrone, saranno probabilmente vicini tra di loro, con questo si spiegano i risultati di figura \ref{png:task-allocator-no-review-MeanDistanceFromTarget}.
+
+\putimage{images/experiments/task-allocator-no-review/MeanDistanceFromTarget.png}{Comportamento del Task Executor}{png:task-allocator-no-review-MeanDistanceFromTarget}{0.99}
+
 Nei metodi dove si fa Review dell'assegnamento ai target (figure \ref{png:task-allocator-nearest-shortened-MeanDistanceFromTarget} e \ref{png:task-allocator-random-shortened-MeanDistanceFromTarget}), questo comporta per i casi in cui l'assegnamento iniziale era Nearest, solo degli svantaggi nei termini di distanza media dai bersagli; questo perchè Nearest era ottima come strategia per avere una bassa distanza iniziale di ogni drone dal suo bersaglio.
 Per i casi in cui l'assegnamento iniziale era Random, si vede come fare Review porti a guadagni in termini di distanza media dai target nel caso in cui si vada ad aggregarsi allo squadrone più bisognoso di droni, mentre se il riassegnamento è casuale, abbiamo risultati più contrastanti(la distanza può anche essere maggiore di quella nel caso noreview).
-
-
 
 Si ricorda che dato che il numero di droni che ogni target richiede  \`e ugale per ogni target, quindi interpretiamo negativamente eventuali squilibri di assegnamento tra target.
 
@@ -356,12 +356,12 @@ Questo accade perch\`e tanto pi\`u \`e alta la probabilit\`a di cambio nel metod
 Quindi in queste condizioni una scelta randomica aiuta a distribuire meglio i droni ma \`e evidente come si possa fare di meglio permettendo a pochi droni (quindi bassa probabilit\`a) di cambiare nello squadrone pi\`u svantaggiato.
 
 \putimagecouple
-{\putsubimage{images/experiments/task-allocator-nearest-shortened/MeanDistanceFromTarget.png}{varianza di distribuzione dei droni sui target con probabilit\`a di cambio alta}{png:task-allocator-nearest-shortened-MeanDistanceFromTarget}{0.4}{0.99}}
-{\putsubimage{images/experiments/task-allocator-random-shortened/MeanDistanceFromTarget.png}{varianza di distribuzione dei droni sui target con probabilit\`a di cambio alta}{png:task-allocator-random-shortened-MeanDistanceFromTarget}{0.4}{0.99}}
+{\putsubimage{images/experiments/task-allocator-nearest-shortened/MeanDistanceFromTarget.png}{distanza media dei droni dai target con scelta iniziale Nearest}{png:task-allocator-nearest-shortened-MeanDistanceFromTarget}{0.4}{0.99}}
+{\putsubimage{images/experiments/task-allocator-random-shortened/MeanDistanceFromTarget.png}{distanza media dei droni dai target con scelta iniziale Nearest}{png:task-allocator-random-shortened-MeanDistanceFromTarget}{0.4}{0.99}}
 
 \putimagecouple
-{\putsubimage{images/experiments/task-allocator-random-shortened/VarTargetDensityOverTime.png}{varianza della densit\`a di droni assegnati ad un target nella fase di allocazione con scelta iniziale random}{png:task-allocator-random-shortened-VarTargetDensityOverTime}{0.4}{0.99}}
-{\putsubimage{images/experiments/task-allocator-random-always/VarTargetDensityOverTime.png}{varianza della densit\`a di droni assegnati ad un target nella fase di allocazione con scelta iniziale Random}{png:task-allocator-random-always-VarTargetDensityOverTime}{0.4}{0.99}}
+{\putsubimage{images/experiments/task-allocator-random-shortened/VarTargetDensityOverTime.png}{varianza di distribuzione dei droni sui target con probabilit\`a di cambio bassa}{png:task-allocator-random-shortened-VarTargetDensityOverTime}{0.4}{0.99}}
+{\putsubimage{images/experiments/task-allocator-random-always/VarTargetDensityOverTime.png}{confronto varianza di distribuzione dei droni sui target con probabilit\`a di cambio bassa e alta}{png:task-allocator-random-always-VarTargetDensityOverTime}{0.4}{0.99}}
 
 \pagebreak
 
