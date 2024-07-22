@@ -175,6 +175,11 @@ Sia il TaskAllocator che il TaskExecutor possiedono uno stato che comanda il lor
 Di base essa termina solo quando tutti i droni \textit{ritengono} di aver finito il compito. Questo pu\`o avvenire in seguito al superamento del numero massimo di iterazioni (\textit{MAX\_ITERATION}), oppure quando il TaskExecutor rileva di essere rimasto \textit{fermo} (o \textit{quasi fermo} oltre una certa soglia di trascurabilit\`a), oppure nel caso in cui si necessita che il TaskAllocator termini dopo aver superato una fase di definizione del target da perseguire.
 Quest'ultimo scenario (non sfruttato nelle nostre analisi) \`e utile nel caso in cui si voglia valutare solo l'operato di diverse strategie di allocazione delle attivit\`a, (attuate queste si termina la simulazione prematuramente).
 
+\subsection{Aspetti Teorici}
+
+Il drone \`e modellato come un \textbf{Agente Isteretico}, in quanto mantiene uno stato interno, percepisce l'ambiente tramite dei sensori e modifica l'ambiente tramite degli attuatori.
+Inoltre \`e un \textbf{Agente Ibrido} in quanto \`e la combinazione di due sotto-agenti autonomi tra loro che concorrono a prendere determinare e perseguire gli obiettivi del drone.
+
 \paragraph{Codice Sorgente}
 
 Il codice di questa implementazione \`e disponibile nel repository Github \textbf{\href{http://github.com/frefolli/argos-experiments}{frefolli/argos-experiments}} \cite{RF:AE}.
@@ -341,9 +346,9 @@ Nelle figure \ref{png:task-allocator-nearest-MeanDistanceFromTarget} e \ref{png:
 {\putsubimage{images/experiments/task-allocator-nearest/MeanDistanceFromTarget.png}{Distanza media dal target nel tempo con scelta iniziale Nearest}{png:task-allocator-nearest-MeanDistanceFromTarget}{0.4}{0.99}}
 {\putsubimage{images/experiments/task-allocator-random/MeanDistanceFromTarget.png}{Distanza media dal target nel tempo con scelta iniziale Random}{png:task-allocator-random-MeanDistanceFromTarget}{0.4}{0.99}}
 
-In generale dato che i target vengono assegnati in base alla vicinanza, vale il principio di localit\`a, cio\`e che droni nello stesso squadrone, saranno probabilmente vicini tra di loro, con questo si spiegano i risultati di figura \ref{png:task-allocator-no-review-MeanDistanceFromTarget}.
+In generale dato che i target vengono assegnati in base alla vicinanza, vale il principio di localit\`a, cio\`e che droni nello stesso squadrone, saranno probabilmente vicini tra di loro, con questo si spiegano i risultati di figura \ref{png:task-allocator-no-review-MeanDistancesWithinSquadron}.
 
-\putimage{images/experiments/task-allocator-no-review/MeanDistanceFromTarget.png}{Comportamento del Task Executor}{png:task-allocator-no-review-MeanDistanceFromTarget}{0.99}
+\putimage{images/experiments/task-allocator-no-review/MeanDistancesWithinSquadron.png}{Media delle distanze all'interno dello squadrone nel tempo}{png:task-allocator-no-review-MeanDistancesWithinSquadron}{0.99}
 
 Nei metodi dove si fa Review dell'assegnamento ai target (figure \ref{png:task-allocator-nearest-shortened-MeanDistanceFromTarget} e \ref{png:task-allocator-random-shortened-MeanDistanceFromTarget}), questo comporta per i casi in cui l'assegnamento iniziale era Nearest, solo degli svantaggi nei termini di distanza media dai bersagli; questo perchè Nearest era ottima come strategia per avere una bassa distanza iniziale di ogni drone dal suo bersaglio.
 Per i casi in cui l'assegnamento iniziale era Random, si vede come fare Review porti a guadagni in termini di distanza media dai target nel caso in cui si vada ad aggregarsi allo squadrone più bisognoso di droni, mentre se il riassegnamento è casuale, abbiamo risultati più contrastanti(la distanza può anche essere maggiore di quella nel caso noreview).
@@ -396,7 +401,23 @@ Per evitare questa eventualit\`a le simulazioni sono state monitorate graficamen
 
 Inoltre quando \`e stato introdotto il decollo diretto, \`e stato necessario modificare l'algoritmo che verifica il criterio per accomodare questo metodo di decollo siccome per come \`e fatto il sistema di accelerazione di ARGoS la differenza di posizione per qualche iterazione era tale da far scattare il criterio di arresto.
 
+\subsection{Numero di Simulazioni Eseguite}
+
+Eseguire pi\`u volte una simulazione con ARGoS con lo stesso \textit{seed} equivale a eseguirlo una volta sola, siccome la sorgente di casualit\`a \`e interamente generata a partire dal seed.
+Quindi si \`e deciso di eseguire una simulazione per \textit{combinazione} (intesa come configurazione di TaskAllocator e TaskExecutor) e utilizzarli per produrre i dati utilizzati nell'analisi della sezione precedente.
+Per non invalidare le simulazioni eseguite di fronte alla possibilit\`a di esecuzioni \textit{fortuite}, ci siamo premurati di eseguire pi\`u volte questi cicli di simulazioni e confrontare i report tra loro per verificare che gli andamenti e le rilevazioni effettuati a partire dai grafici fossero contrastanti.
+Nella presente relazione si riportano le ultime esecuzioni che abbiamo effettuato, ma le altre erano sostanzialmente simili.
+
+Sarebbe possibile eseguire pi\`u simulazioni premurandosi di mantenere lo stesso seed tra le diverse combinazioni di parametri, ma questo condurrebbe inevitabilmente all'utilizzo di una compressione dei dati per poterne fare la media (infatti con seed diversi otteniamo lunghezze delle simulazioni leggermente diverse).
+Per comprimere curve di lunghezze diverse avevamo utilizzato la Media Mobile, che permette di ottenere curve direttamente confrontabili in termini di lunghezza. Il problema di ci\`o deriva dal fatto che in alcuni casi (in base allo scenario indotto dal seed) le medie prodotte a partire dalle medie mobili risultavano molto distorte fino a confondere o distruggere la significativit\`a dei dati.
+Per questa ragione dopo una prima fase di sperimentazione, questo approccio \`e stato abbandonato.
+
 \section{Conclusioni}
+
+Sono state eseguite diverse simulazioni che hanno evidenziato aspetto positivi e negativi delle strategie implementate.
+\`E emerso come una strategia basata sul Decollo Diretto sia da preferire (in connubio con un potenziale reattivo come LP) nel caso in cui il sistema sia poco rumoroso; in caso contrario il Decollo Verticale \`e pi\`u resiliente al rumore e permette di evitare pi\`u occasioni di collisione.
+Inoltre si \`e visto come inizializzare con policy Nearest i target assegnati ai droni, e poi utilizzare un algoritmo di cambio di target probabilistico che sposta con una certa probabilit\`a $p$ i droni da uno squadrone sovrabbondante a uno pi\`u bisognoso permette di distribuire bene i droni e mantenere bassa la distanza media che gli stessi devono percorrere durante la missione.
+In conclusione, una combinazione di un TaskAllocator e di un TaskExecutor siffatto permettono di ottenere i migliori risultati alla luce dell'analisi.
 
 \printbibliography[title={Bibliografia}]
 
