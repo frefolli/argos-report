@@ -178,7 +178,7 @@ Quest'ultimo scenario (non sfruttato nelle nostre analisi) \`e utile nel caso in
 \subsection{Aspetti Teorici}
 
 Il drone \`e modellato come un \textbf{Agente Isteretico}, in quanto mantiene uno stato interno, percepisce l'ambiente tramite dei sensori e modifica l'ambiente tramite degli attuatori.
-Inoltre \`e un \textbf{Agente Ibrido} in quanto \`e la combinazione di due sotto-agenti autonomi tra loro che concorrono a prendere determinare e perseguire gli obiettivi del drone.
+Inoltre \`e un \textbf{Agente Ibrido} in quanto \`e la combinazione di due sotto-agenti autonomi tra loro che concorrono a determinare e perseguire gli obiettivi del drone.
 
 \paragraph{Codice Sorgente}
 
@@ -362,7 +362,7 @@ Quindi in queste condizioni una scelta randomica aiuta a distribuire meglio i dr
 
 \putimagecouple
 {\putsubimage{images/experiments/task-allocator-nearest-shortened/MeanDistanceFromTarget.png}{distanza media dei droni dai target con scelta iniziale Nearest}{png:task-allocator-nearest-shortened-MeanDistanceFromTarget}{0.4}{0.99}}
-{\putsubimage{images/experiments/task-allocator-random-shortened/MeanDistanceFromTarget.png}{distanza media dei droni dai target con scelta iniziale Nearest}{png:task-allocator-random-shortened-MeanDistanceFromTarget}{0.4}{0.99}}
+{\putsubimage{images/experiments/task-allocator-random-shortened/MeanDistanceFromTarget.png}{distanza media dei droni dai target con scelta iniziale Random}{png:task-allocator-random-shortened-MeanDistanceFromTarget}{0.4}{0.99}}
 
 \putimagecouple
 {\putsubimage{images/experiments/task-allocator-random-shortened/VarTargetDensityOverTime.png}{varianza di distribuzione dei droni sui target con probabilit\`a di cambio bassa}{png:task-allocator-random-shortened-VarTargetDensityOverTime}{0.4}{0.99}}
@@ -395,6 +395,8 @@ Se due droni collidono non \`e stato definito un comportamento specifico: nella 
 
 
 \subsection{Generalit\`a}
+Eseguire pi\`u volte una simulazione con ARGoS con lo stesso \textit{seed} equivale a eseguirlo una volta sola, siccome la sorgente di casualit\`a \`e interamente generata a partire dal seed.
+
 Avendo fissato il numero di droni, di target e il seed che determina le posizioni di droni e target, i nostri esperimenti possono essere criticati per mancanza di generalità. I risultati tratti da questi sono riferiti a uno scenario con 20 droni, 5 target e 5 droni richiiesti da ogni target, e ad una certa disposizione spaziale di target e droni, e per dimostrare che questi sono applicabili a scenari dove variano queste caratteristiche, bisognerebbe fare più esperimenti dove si varia diversi valori di queste variabili.
 
 Ad onor del vero, prima di raggiungere questo setup sperimentale finale abbiamo usato anche provato con seed diversi ad ogni esperimento (quindi la disposizione di droni e target cambia), per poi fare la media di 10 simulazioni per ogni strategia analizzata, e i risultati non sono stati poi così diversi.
@@ -408,22 +410,23 @@ Per evitare questa eventualit\`a le simulazioni sono state monitorate graficamen
 
 Inoltre quando \`e stato introdotto il decollo diretto, \`e stato necessario modificare l'algoritmo che verifica il criterio per accomodare questo metodo di decollo siccome per come \`e fatto il sistema di accelerazione di ARGoS la differenza di posizione per qualche iterazione era tale da far scattare il criterio di arresto.
 
-\subsection{Numero di Simulazioni Eseguite}
 
-Eseguire pi\`u volte una simulazione con ARGoS con lo stesso \textit{seed} equivale a eseguirlo una volta sola, siccome la sorgente di casualit\`a \`e interamente generata a partire dal seed.
-Quindi si \`e deciso di eseguire una simulazione per \textit{combinazione} (intesa come configurazione di TaskAllocator e TaskExecutor) e utilizzarli per produrre i dati utilizzati nell'analisi della sezione precedente.
-Per non invalidare le simulazioni eseguite di fronte alla possibilit\`a di esecuzioni \textit{fortuite}, ci siamo premurati di eseguire pi\`u volte questi cicli di simulazioni e confrontare i report tra loro per verificare che gli andamenti e le rilevazioni effettuati a partire dai grafici fossero contrastanti.
-Nella presente relazione si riportano le ultime esecuzioni che abbiamo effettuato, ma le altre erano sostanzialmente simili.
-
-Sarebbe possibile eseguire pi\`u simulazioni premurandosi di mantenere lo stesso seed tra le diverse combinazioni di parametri, ma questo condurrebbe inevitabilmente all'utilizzo di una compressione dei dati per poterne fare la media (infatti con seed diversi otteniamo lunghezze delle simulazioni leggermente diverse).
-Per comprimere curve di lunghezze diverse avevamo utilizzato la Media Mobile, che permette di ottenere curve direttamente confrontabili in termini di lunghezza. Il problema di ci\`o deriva dal fatto che in alcuni casi (in base allo scenario indotto dal seed) le medie prodotte a partire dalle medie mobili risultavano molto distorte fino a confondere o distruggere la significativit\`a dei dati.
-Per questa ragione dopo una prima fase di sperimentazione, questo approccio \`e stato abbandonato.
 
 \section{Conclusioni}
 
 Sono state eseguite diverse simulazioni che hanno evidenziato aspetto positivi e negativi delle strategie implementate.
-\`E emerso come una strategia basata sul Decollo Diretto sia da preferire (in connubio con un potenziale reattivo come LP) nel caso in cui il sistema sia poco rumoroso; in caso contrario il Decollo Verticale \`e pi\`u resiliente al rumore e permette di evitare pi\`u occasioni di collisione.
-Inoltre si \`e visto come inizializzare con policy Nearest i target assegnati ai droni, e poi utilizzare un algoritmo di cambio di target probabilistico che sposta con una certa probabilit\`a $p$ i droni da uno squadrone sovrabbondante a uno pi\`u bisognoso permette di distribuire bene i droni e mantenere bassa la distanza media che gli stessi devono percorrere durante la missione.
+
+<SPIEGARE BREVEMENTE STRATEGIE>
+
+Inoltre si \`e visto come inizializzare con Nearest i target assegnati ai droni porta a  mantenere la distanza media che gli stessi devono percorrere durante la missione inferiore a un inizializzazione Random.
+
+Con asseganmento iniziale Random i metodi Probable Minority, tanto più è pbobabile la rilocazione, tanto pi\`u generano squadroni squilibrati nel numero di droni che gli appartengono.
+
+Abbiamo visto che in sistemi privi di rumore il Decollo Diretto permette di risparmiare eneriga, metre se è presente rumore allora il Decollo Verticale è molto meglio in questo.
+
+Il potenziale LP è risultato il più adatto a garantire una distanza minima tra i droni in volo.
+
+
 In conclusione, una combinazione di un TaskAllocator e di un TaskExecutor siffatto permettono di ottenere i migliori risultati alla luce dell'analisi.
 
 \printbibliography[title={Bibliografia}]
