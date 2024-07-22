@@ -265,6 +265,30 @@ Per realizzare ci\`o \`e fondamentale valutare l'impatto del coefficiente di rum
 
 \putimage{images/task-executor.png}{Comportamento del Task Executor}{png:task-executor}{0.99}
 
+\subsection{Esempio Grafico}
+
+All'inizio i droni sono tutti a terra e vengono generati 5 target in posizioni randomiche.
+
+\putimagecouple
+{\putsubimage{images/esempio/iterazione_zero_top.png}{Fase iniziale, vista dall'alto}{png:iterazione_zero_top}{0.45}{0.99}}
+{\putsubimage{images/esempio/iterazione_zero_left.png}{Fase iniziale, vista da sinistra}{png:iterazione_zero_left}{0.45}{0.99}}
+
+Dopo le fasi di review, i droni iniziano la fase di ascesa. Alcuni di essi iniziano il decollo, mentre altri rimangono in attesa.
+
+\putimagecouple
+{\putsubimage{images/esempio/iterazione_venti_top.png}{Fase di Ascesa, vista dall'alto}{png:iterazione_venti_top}{0.45}{0.99}}
+{\putsubimage{images/esempio/iterazione_venti_left.png}{Fase di Ascesa, vista da sinistra}{png:iterazione_venti_left}{0.45}{0.99}}
+
+Alla fine della simulazione i droni si sono schierati in formazione attorno ai target.
+In questo esempio gli squadroni non sono equilibrati.
+Le strategie implementate in questo progetto devono tendere ad equilibrare la partizione dei droni e ad evitare le collisioni durante il volo.
+
+\putimagecouple
+{\putsubimage{images/esempio/iterazione_finale_top.png}{Simulazione terminata, vista dall'alto}{png:iterazione_finale_top}{0.45}{0.99}}
+{\putsubimage{images/esempio/iterazione_finale_left.png}{Simulazione terminata, vista da sinistra}{png:iterazione_finale_left}{0.45}{0.99}}
+
+\pagebreak
+
 \section{Esperimenti e Risultati}
 
 Sono state condotte delle simulazioni con ARGoS variando in ciascuna la strategia implementata ma mantenendo lo stesso Seed che inizializza il Pseudo Random Number Generator per confrontare direttamente approcci differenti nello stesso scenario.
