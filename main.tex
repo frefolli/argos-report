@@ -139,8 +139,8 @@ L'obiettivo del progetto \`e simulare uno sciame di 20 droni volanti il cui scop
   \item raggiungere i 5 obiettivi sparsi nell'ambiente, evitando collisioni con altri droni durante il volo.
 \end{enumerate}
 
+Gli obiettivi sono generati randomicamente usando una distribuzione uniforme sulle 3 componenti spaziali, i cui limiti sono gli stessi dei droni e dell'arena.
 Una partizione \`e considerata \textit{buona} se la distribuzione dei droni sugli obiettivi \`e uniforme, ovvero se la varianza del numero di droni per squadrone \`e bassa.
-
 
 Per la simulazione ci siamo avvalsi di ARGoS \cite{Pinciroli:SI2012}, un simulatore programmabile Free and Open Source.
 
@@ -391,7 +391,8 @@ Se due droni collidono non \`e stato definito un comportamento specifico: nella 
 \subsection{Criterio di Arresto}
 
 Il criterio di arresto utilizzato dal nostro modello accomoda lo scenario in cui i droni sono arrivati in formazione ma non tiene in considerazione adeguatamente il caso in cui gli stessi finiscano in deadlock.
-In quel caso sarebbero fermi esattamente come nel caso siano realmente arrivati. Per evitare questa eventualit\`a le simulazioni sono state monitorate graficamente per assicurarsi che fossero valide e in aggiunta si \`e sperimentata l'aggiunta di rumore al vettore di velocit\`a passato all'attuatore.
+Se due droni sono fermi uno davanti all'altro perch\`e vorrebbero procedere in direzione l'una opposta all'altra, sarebbero fermi esattamente come se fossero fermi in formazione su un target.
+Per evitare questa eventualit\`a le simulazioni sono state monitorate graficamente per assicurarsi che fossero valide e in aggiunta si \`e sperimentata l'aggiunta di rumore al vettore di velocit\`a passato all'attuatore.
 
 Inoltre quando \`e stato introdotto il decollo diretto, \`e stato necessario modificare l'algoritmo che verifica il criterio per accomodare questo metodo di decollo siccome per come \`e fatto il sistema di accelerazione di ARGoS la differenza di posizione per qualche iterazione era tale da far scattare il criterio di arresto.
 
