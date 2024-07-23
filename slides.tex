@@ -91,7 +91,7 @@ Nelle prove sul task allocator variano i seguenti componenti:
   \item (se review presente) Review: Probable \textbf{Minority} vs Probable \textbf{Random}
 \end{itemize}
 
-Durante le prove sul task allocator veniva usata la variante di task executor con decollo verticale, LP come potenziale e senza rumore negli attuatori.
+Durante le prove sul task allocator viene usato un task executor con decollo verticale, LP come potenziale e senza rumore negli attuatori.
 \end{frame}
 
 \begin{frame}
@@ -128,14 +128,14 @@ Nelle prove sul task executor variano i seguenti componenti:
   \item Tipo di decollo: \textbf{Verticale} o \textbf{Diretto}.
 \end{itemize}
 
-Durante le prove sul task executor veniva usata la variante di task allocator con scelta iniziale Random e nessuna iterazione di Review.
+Durante le prove sul task executor viene usato un task allocator con scelta iniziale Random e nessuna iterazione di Review.
 \end{frame}
 
 \section{Esempio}
 \begin{frame}
 \centering
 \Huge
-Esempio
+Esempio con decollo verticale
 \end{frame}
 
 \begin{frame}
@@ -228,7 +228,7 @@ I Limiti
 \end{frame}
 
 \begin{frame}
-\frametitle{ARGoS}
+\frametitle{Limiti di ARGoS}
 Il simulatore ha diversi problemi:
 
 \begin{itemize}
@@ -272,18 +272,24 @@ Contromisure:
 \begin{frame}
 \frametitle{Generalit\`a}
 \begin{itemize}
-  \item La simulazione \`e deterministica fissato il seed $\Rightarrow$ esecuzione di una sola simulazione per combinazione.
-  \item Lo scenario \`e fissato (\# di droni, \# di target .. etc) $\Rightarrow$ pi\`u esecuzioni con seed diversi
+  \item La simulazione \`e deterministica fissato il seed $\Rightarrow$ esecuzione di una sola simulazione per combinazione di paramentri sperimentali.
   \item Controllo di coerenza tra i risultati delle analisi di diverse esecuzioni
+  \item  I nostri risultati sono relativi al nostro setup sperimentale, che può diventare pi\`u generale cambiando i valori dei parametri delle simulazioni e mediando i risultati.  
 \end{itemize}
 \end{frame}
 
 \section{Conclusioni}
 
 \begin{frame}
-\centering
-\Huge
-Conclusioni
+\frametitle{Conclusioni}
+\begin{itemize}
+  \item inizializzare con Nearest piuttosto che con Random $\Rightarrow$ distanza media da percorrere inferiore e distanze tra droni dello stesso squadrone inferiori.
+  \item con assegnamento iniziale Random e metodo di revisione Probable Minority $\Rightarrow$ 
+tanto più è probabile la rilocazione, tanto più essi generano squadroni squilibrati.
+    \item  in sistemi privi di rumore il Decollo Diretto permette di risparmiare
+eneriga, metre se è presente rumore allora il Decollo Verticale è molto meglio in questo.
+    \item LP $\Rightarrow$ potenziale che garantisce una distanza minima tra i droni in volo.
+\end{itemize}
 \end{frame}
 
 \begin{frame}
