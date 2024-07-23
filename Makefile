@@ -1,18 +1,15 @@
-@all: main.pdf
+REPORT=report
+SLIDES=slides
 
-main.pdf: main.tex quotes.bib
-	pdflatex main.tex
-	bibtex main.aux
-	pdflatex main.tex
+@all: ${REPORT}.pdf ${SLIDES}.pdf
 
-rel.pdf: main.pdf
-	cp main.pdf rel.pdf
+${REPORT}.pdf: ${REPORT}.tex quotes.bib
+	pdflatex ${REPORT}.tex
+	bibtex ${REPORT}.aux
+	pdflatex ${REPORT}.tex
 
-lvim:
-	lvim main.tex
-
-send: main.pdf
-	mv main.pdf ~/Desktop/argos-report.pdf
+${SLIDES}.pdf: ${SLIDES}.tex
+	pdflatex ${SLIDES}.tex
 
 clean:
-	rm -rf *.idx main.pdf *-blx.bib *.aux *.log *.run.xml *.toc *.ilg *.ind
+	rm -rf *.idx ${REPORT}.pdf ${SLIDES}.pdf *-blx.bib *.aux *.log *.run.xml *.toc *.ilg *.ind *.bbl  *.blg *.out *.nav *.snm

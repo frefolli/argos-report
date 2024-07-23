@@ -1,0 +1,212 @@
+\documentclass{beamer}
+\usepackage{graphicx}
+
+\usetheme{Madrid}
+\usecolortheme{default}
+
+\title{Sistemi Complessi: Modelli e Simulazioni}
+\subtitle{Sciami di Droni con ARGoS}
+\author{Preziosa~A.~866142 \and ~Refolli~F.~865955}
+%\logo{\includegraphics[height=1cm]{logo_unimib.pdf}}
+
+\newcommand{\putimage}[2] {
+  \begin{figure}
+    \centering
+    \includegraphics[width=#2\linewidth]{#1}
+	\end{figure}
+}
+
+\newcommand{\putimagecouple}[4] {
+  \begin{figure}[!htb]
+    \centering
+    \begin{minipage}{0.45\linewidth}
+      \centering
+      \includegraphics[width=\linewidth]{#1}
+      \caption{#2}
+    \end{minipage}
+    \hspace{0.25cm}
+    \begin{minipage}{0.45\linewidth}
+      \centering
+      \includegraphics[width=\linewidth]{#3}
+      \caption{#4}
+    \end{minipage}
+  \end{figure}
+}
+
+\begin{document}
+
+\frame{\titlepage}
+
+\begin{frame}
+\frametitle{Indice}
+\tableofcontents
+\end{frame}
+
+\section{Introduzione}
+
+\begin{frame}
+\frametitle{Swarm Robotics}
+  \putimage{images/swarm\_robotics.JPG}{0.9}
+\end{frame}
+
+\begin{frame}
+\frametitle{ARGoS}
+\putimage{images/argos3.png}{0.9}
+\end{frame}
+
+\begin{frame}
+\frametitle{Architettura di ARGoS}
+\putimage{images/architecture.png}{0.9}
+\end{frame}
+
+\section{La Simulazione}
+
+\begin{frame}
+\frametitle{Modello della Simulazione}
+\putimage{images/simulation-model.png}{0.9}
+\end{frame}
+
+\begin{frame}
+\frametitle{Task Allocator}
+\putimage{images/task-allocator.png}{0.9}
+\end{frame}
+
+\begin{frame}
+\frametitle{Task Executor}
+\putimage{images/task-executor.png}{0.9}
+\end{frame}
+
+\begin{frame}
+\frametitle{Task Executor: I Potenziali}
+Detta $d$ la distanza tra due corpi soggetti alla forza repulsiva (i droni), $A$ un moltiplicatore specifico di ogni potenziale utilizzato per ottimizzarne l'intensit\`a e $D$ una distanza media che si vuole mantenere tra due droni, si riportano le formule per ricavare le forze di attrazione:
+
+\begin{itemize}
+  \item $GP(d) = -A_{GP} \frac {|D - d|} {d}$
+  \item $JP(d) = -A_{JP} \frac {D - d} {d^2}$
+  \item $LP(d) = -A_{LP} 4 ({\frac {D} {d}}^6 - {\frac {D} {d}}^{12})$
+\end{itemize}
+
+Si riportano anche i valori dei coefficienti $A$ che abbiamo utilizzato:
+
+\begin{itemize}
+  \item $A_{GP} = 4.0$
+  \item $A_{JP} = 16.0$
+  \item $A_{LP} = 0.2$
+\end{itemize}
+\end{frame}
+
+\section{Esempio}
+
+\begin{frame}
+\frametitle{Situazione Iniziale}
+\putimage{images/esempio/iterazione\_zero\_left.png}{0.9}
+\end{frame}
+
+\begin{frame}
+\frametitle{Fase di Ascesa}
+\putimage{images/esempio/iterazione\_venti\_left.png}{0.9}
+\end{frame}
+
+\begin{frame}
+\frametitle{Situazione Finale}
+\putimage{images/esempio/iterazione\_finale\_top.png}{0.9}
+\end{frame}
+
+\section{Esperimenti}
+
+\subsection{Task Executor}
+
+\begin{frame}
+\frametitle{I Potenziali a Confronto / 1}
+\end{frame}
+
+\begin{frame}
+\frametitle{I Potenziali a Confronto / 2}
+\end{frame}
+
+\begin{frame}
+\frametitle{I Potenziali a Confronto / 3}
+\end{frame}
+
+\begin{frame}
+\frametitle{Decollo Verticale e Decollo Diretto / 1}
+\end{frame}
+
+\begin{frame}
+\frametitle{Decollo Verticale e Decollo Diretto / 2}
+\end{frame}
+
+\begin{frame}
+\frametitle{Decollo Verticale e Decollo Diretto / 3}
+\end{frame}
+
+\subsection{Task Allocator}
+
+\begin{frame}
+\frametitle{Scelta Iniziale: Random vs Nearest / 1}
+\end{frame}
+
+\begin{frame}
+\frametitle{Scelta Iniziale: Random vs Nearest / 2}
+\end{frame}
+
+\begin{frame}
+\frametitle{Fase di Review / 1}
+\end{frame}
+
+\begin{frame}
+\frametitle{Fase di Review / 2}
+\end{frame}
+
+\section{I Limiti}
+
+\begin{frame}
+\frametitle{I Limiti}
+\centering
+\Huge
+ARGoS
+\end{frame}
+
+\begin{frame}
+\frametitle{I Limiti}
+\centering
+\Huge
+Forze di Separazione
+\end{frame}
+
+\begin{frame}
+\frametitle{I Limiti}
+\centering
+\Huge
+Modellazione delle Collisioni
+\end{frame}
+
+\begin{frame}
+\frametitle{I Limiti}
+\centering
+\Huge
+Criterio di Arresto
+\end{frame}
+
+\begin{frame}
+\frametitle{I Limiti}
+\centering
+\Huge
+Generalit\`a
+\end{frame}
+
+\section{Conclusioni}
+
+\begin{frame}
+\centering
+\Huge
+Conclusioni
+\end{frame}
+
+\begin{frame}
+\centering
+\Huge
+Fine
+\end{frame}
+
+\end{document}

@@ -1,5 +1,4 @@
 *.idx
-main.pdf
 *-blx.bib
 *.aux
 *.log
@@ -10,3 +9,5 @@ main.pdf
 *.bbl
 *.blg
 *.out
+*.nav
+*.snm

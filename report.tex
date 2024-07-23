@@ -1,0 +1,458 @@
+\documentclass[a4paper,11pt,oneside, table]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{setspace}
+\usepackage{imakeidx}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{pdfpages}
+\usepackage{csquotes}
+\usepackage{caption}
+\captionsetup[table]{labelfont=it}
+\usepackage{pifont}% http://ctan.org/pkg/pifont
+
+\newcommand{\cmark}{\ding{51}}%
+\newcommand{\xmark}{\ding{55}}%
+
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    pdftitle={Overleaf Example},
+    pdfpagemode=FullScreen,
+    }
+
+\usepackage{listings}
+\usepackage{listings-cpp}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+\newtheorem{nota}{Nota}
+
+\usepackage[italian]{babel}
+\usepackage[
+  backend=bibtex,
+  style=numeric,
+  sorting=ydnt
+  ]{biblatex}
+\addbibresource{quotes.bib}
+\makeindex
+
+\newcommand{\putimage}[4] {
+	\begin{figure}[H]
+	    \centering
+	    \includegraphics[width={#4}\linewidth]{#1}
+	    \caption{#2}\label{#3}
+	\end{figure}
+}
+
+\newcommand{\putsubimage}[5] {
+  \begin{minipage}{{#4}\linewidth}
+	    \centering
+      \includegraphics[width={#5}\linewidth]{#1}
+	    \caption{#2}\label{#3}
+	\end{minipage}
+}
+
+\newcommand{\putimagecouple}[2] {
+  \begin{figure}[!htb]
+      \centering
+      #1
+      \hspace{0.5cm}
+      #2
+  \end{figure}
+}
+
+\newcommand{\putimagequadruple}[4] {
+  \begin{figure}[!htb]
+      \centering
+      #1
+      \hspace{0.5cm}
+      #2
+      \linebreak
+      #3
+      \hspace{0.5cm}
+      #4
+  \end{figure}
+}
+
+\begin{document}
+    \begin{titlepage}
+        \noindent
+        \begin{minipage}[t]{0.19\textwidth}
+            \vspace{-4mm}{\includegraphics[scale=1.15]{logo_unimib.pdf}}
+        \end{minipage}
+        \begin{minipage}[t]{0.81\textwidth}
+        {
+                \setstretch{1.42}
+                {\textsc{Università degli Studi di Milano - Bicocca}} \\
+                \textbf{Scuola di Scienze} \\
+                \textbf{Dipartimento di Informatica, Sistemistica e Comunicazione} \\
+                \textbf{Corso di laurea magistrale in Informatica} \\
+                \par
+        }
+        \end{minipage}
+    	\vspace{40mm}
+    	\begin{center}
+            {\LARGE{
+                    \setstretch{1.2}
+                    \textbf{Relazione di Sistemi Complessi: Modelli e Simulazioni}
+                    \par
+            }}
+        \end{center}
+        
+        \vspace{50mm}
+        
+        \vspace{15mm}
+
+        \begin{flushright}
+            {\large \textbf{Relazione di:}} \\
+            \large{Preziosa Alessandro} \large{866142} \\
+            \large{Refolli Francesco} \large{865955}
+        \end{flushright}
+        
+        \vspace{40mm}
+        \begin{center}
+            {\large{\bf Anno Accademico 2023-2024}}
+        \end{center}
+        \restoregeometry
+    \end{titlepage}
+
+    \printindex
+    \tableofcontents
+    \renewcommand{\baselinestretch}{1.5}
+
+\section{Introduzione}
+
+La \textbf{Swarm Robotics} \`e un filone di ricerca della robotica che si occupa di costruire sistemi intelligenti formati da una moltitudine di droni/robot indipendenti eventualmente eterogenei (detto sciame) per raggiungere tramite algoritmi fortemente decentralizzati un obiettivo di interesse collettivo.
+Le applicazioni della Swarm Robotics spaziano in campo civile e militare.
+Solitamente la ricerca si concentra su scenari che prevedono il salvataggio di persone (Search and Rescue), la ricognizione di un ambiente, o l'impiego operativo in battaglia.
+Gli algoritmi di Swarm Robotics possono anche avere ispirazione biologica\cite{mclurkin2005dynamic}.
+
+Per la realizzazione di questi esperimenti sono stati costruiti diversi simulatori e qualche framework fisico per l'implementazione di sciami omogenei di robot.
+
+L'obiettivo del progetto \`e simulare uno sciame di 20 droni volanti il cui scopo \`e:
+\begin{enumerate}
+  \item dividersi in 5 squadroni (partizioni dell'insieme di droni)
+  \item decollare
+  \item raggiungere i 5 obiettivi sparsi nell'ambiente, evitando collisioni con altri droni durante il volo.
+\end{enumerate}
+
+La collocazione degli obiettivi \`e stata generata casualmente usando una distribuzione uniforme sulle 3 componenti spaziali, i cui limiti sono gli stessi dei droni e dell'arena.
+Una partizione \`e considerata \textit{buona} se la distribuzione dei droni sugli obiettivi \`e uniforme, ovvero se la varianza del numero di droni per squadrone \`e bassa.
+
+Per la simulazione ci siamo avvalsi di ARGoS \cite{Pinciroli:SI2012}, un simulatore programmabile Free and Open Source.
+
+\section{ARGoS}
+
+ARGoS \`e un simulatore di droni che permette di utilizzare diversi engine fisici a 2 o 3 dimensioni e aggiungere programmaticamente plugin per nuovi droni o nuovi contenuti.
+
+In figura \ref{png:architecture} \`e riportato uno schema di funzionamento dell'engine di ARGoS da cui si possono trarre alcune osservazioni.
+Per comandare un drone si deve implementare un \textbf{Controller}, il quale tramite \textbf{Attuatori} e \textbf{Sensori} pu\`o interagine con l'ambiente e con gli altri droni.
+Solitamente questi componenti si appoggiano su un \textbf{Media} che costituisce il canale di comunicazione e storage delle informazioni.
+Un altro valido strumento fornito al programmatore sono le \textbf{Loop Functions}, funzioni che vengono eseguite ad ogni tick, all'inizio o alla fine della simulazione per consentire interazioni custom con l'ambiente o di inizializzare la simulazione (per esempio istanziando oggetti o facendo controlli).
+Una variante di queste sono le \textbf{User Functions}, che vengono solitamente impiegate per costruire effetti visivi in quanto permettono di interagire con lo stack grafico di ARGoS, per esempio disegnando label sulle entit\`a.
+Queste integrazioni vengono realizzate sotto forma di plugins che possono essere caricati dinamicamente tramite una configurazione XML di una simulazione, che permette anche di disporre automaticamente delle entit\`a nello spazio, di configurare i controller e abilitare le functions (non si possono utilizzare pi\`u di una Loop Function e di una User Function contemporaneamente).
+L'Ambiente \`e definito in ARGoS in alcuni contesti \textit{Arena} ma \`e sostanzialmente un termine intercambiabile.
+
+\putimage{images/architecture.png}{Architettura di ARGoS}{png:architecture}{0.99}
+
+\section{Modello}
+
+In figura \ref{png:simulation-model} si riporta lo schema logico dei componenti implementati per la simulazione.
+Il \textit{cervello} del drone \`e suddiviso in due emisferi: un \textbf{TaskAllocator} che si occupa di decidere a quale target deve mirare (e quindi dove andare), un \textbf{TaskExecutor} che esegue questa volont\`a decidendo come raggiungere gli obiettivi del drone e come evitare collisioni tra droni.
+Entrambi questi componenti fanno uso di un \textbf{Random Number Generator}, del \textbf{Positioning Sensor} (che fornisce informazioni circa il proprio orientamento e il proprio posizionamento nell'ambiente) e un \textbf{Range And Bearing Sensor}.
+
+Il \textit{Range and Bearing} rappresenta un antenna radio che permette di inviare e ricevere segnali. Questo viene fatto all'interno di ARGoS tramite un buffer di memoria dalla dimensione prefissata (\textit{RAB\_size}) all'inizio della simulazione.
+Il sensore \textit{riceve} questi segnali da una distanza massima prefissata (\textit{RAB\_range}), e fornisce al controllore che li processa sia il contenuto del messaggio (\textit{Data}), sia la distanza da cui \`e stato percepito (\textit{Range}) e l'orientamento locale al sistema di riferimento del drone da cui proviene (\textit{HorizontalBearing e VerticalBearing}).
+Per non complicare troppo il modello si \`e deciso di impostare il \textit{RAB\_range} ad un valore sufficiente per consentire a tutti i droni di ricevere tutti i segnali da ogni parte dell'Arena.
+Per come \`e stato implementato in ARGoS non \`e possibile aggiornare lo stato dell'attuatore solo quando cambia uno stato locale ma \`e necessario scrivere un valore ogni volta. % (poteva essere implementato in modo pi\`u performante).
+Dei dati che devono essere scritti sull'attuatore se ne occupa il Controller del drone, il quale mantiene anche un \textbf{log} con alcune informazioni circa lo stato del drone e della simulazione dal punto di vista locale di esso.
+
+Sia il TaskAllocator che il TaskExecutor possiedono un rispettivo stato che comanda il loro agire, in particolare in base alle esigenze della simulazione gli stati pozzo (\textit{Idle} e \textit{Arrived}) possono essere utilizzati per terminare la simulazione.
+Di base essa termina solo quando tutti i droni \textit{ritengono} di aver finito il compito. Questo pu\`o avvenire in seguito al superamento del numero massimo di iterazioni (\textit{MAX\_ITERATION}), oppure quando il TaskExecutor rileva di essere rimasto \textit{fermo} (o \textit{quasi fermo} oltre una certa soglia di trascurabilit\`a), oppure nel caso in cui si necessita che il TaskAllocator termini dopo aver superato una fase di definizione del target da perseguire.
+Quest'ultimo scenario (non sfruttato nelle nostre analisi) \`e utile nel caso in cui si voglia valutare solo l'operato di diverse strategie di allocazione delle attivit\`a, (attuate queste si termina la simulazione prematuramente).
+
+\paragraph{Aspetti Teorici}
+
+Il drone \`e modellato come un \textbf{Agente Isteretico}, in quanto mantiene uno stato interno, percepisce l'ambiente tramite dei sensori e modifica l'ambiente tramite degli attuatori.
+Inoltre \`e un \textbf{Agente Ibrido} in quanto \`e la combinazione di due sotto-agenti autonomi tra loro che concorrono a determinare e perseguire gli obiettivi del drone.
+Infine \`e un \textbf{Agente Reattivo} perch\`e non dispone di una rappresentazione logica del mondo in cui \`e immerso e del proprio obiettivo, ma reagisce agli stimoli dell'ambiente.
+
+\paragraph{Codice Sorgente}
+
+Il codice di questa implementazione \`e disponibile nel repository Github \textbf{\href{http://github.com/frefolli/argos-experiments}{frefolli/argos-experiments}} \cite{RF:AE}.
+Per le analisi sui risultati sono stati scritti inoltre degli script Python per elaborare i log prodotti dai controller, diponibili nel repository \textbf{\href{http://github.com/frefolli/argos-visualizer}{frefolli/argos-visualizer}} \cite{RF:AV} insieme ad un ulteriore simulatore che permette di riprodurre (sebbene in modo pi\`u semplice) i log in forma di simulazione grafica.
+Infine si \`e fatto uso di una versione modificata di ARGoS per correggere alcuni errori / implementare alcune feature lasciate parzialmente inutilizzabili dallo sviluppatore originale del simulatore. Questa versione modificata \`e disponibile nel repository \textbf{\href{http://github.com/frefolli/argos3}{frefolli/argos3}} \cite{RF:A3}.
+
+\putimage{images/simulation-model.png}{Modello della Simulazione}{png:simulation-model}{0.99}
+
+\section{Strategie implementate}
+
+\subsection{TaskAllocator}
+
+Un riassunto dell'implementazione del TaskAllocator \`e osservabile in figura \ref{png:task-allocator}.
+
+\subsubsection{Letteratura}
+
+Alcune pubblicazioni consultate \cite{mclurkin2005dynamic} \cite{gaerther2013uav} consigliano approcci dove dopo una scelta iniziale (randomica, secondo qualche criterio di vicinanza .. etc) i droni comunicano direttamente o ascoltando le intenzioni dei vicini e prendono delle decisioni su base probabilistica per distribuire uniformemente i droni nei \textit{task} da effettuare .
+Di conseguenza le nostre implementazioni si sono basate su queste idee generali. Nel nostro caso il task di ogni drone \`e approcciare uno dei target.
+
+\subsubsection{Scelta iniziale del Target}
+
+Ogni drone all'inizio della simulazione sceglie un target iniziale, questo pu\`o essere fatto scegliendo un target a caso ("metodo Random") o prendendo il pi\`u vicino ("metodo Nearest").
+Il secondo approccio punta a minimizzare le disanze, ma il secondo (se la distribuzione \`e uniforme) tende a minimizzare la varianza delle grandezze degli squadroni.
+Si ricorda che ogni squadrone \`e definito come i droni che agganciano un target.
+Dopo la fase iniziale di scelta del target si pu\`o decidere di considerare l'allocazione terminata senza ulteriori modifiche o di eseguire qualche iterazione di un algoritmo decentralizzato che tenti equilibrare le composizioni degli squadroni.
+Questa seconda fase di allocazione verr\`a chiamata \textit{revisione}.
+
+\subsubsection{Fase di revisione della scelta del Target}
+
+Durante le iterazioni della fase di revisione \`e possibile cambiare il proprio target solo se il proprio squadrone ha troppi droni assegnati rispetto a quanti ne dovrebbe avere.
+Nel caso in cui per un drone sia possibile cambiare il proprio target, abbiamo creato due strategie possibili che pu\`o adottare:
+\begin{enumerate}
+    \item cambio squadrone scegliendone uno a caso ("metodo Random")
+    \item cambio squadrone scegliendo quello pi\`u bisognoso di droni ("metodo Minority").
+\end{enumerate}
+
+La rilocazione, possibile solo nel caso in qui in mio squadrone sia in eccesso di droni, pu\`o avvenire certamente o avvenire con una certa probabilit\`a. Essa governa sia la probabilit\`a che la distribuzione di droni negli squadroni diventi pi\`u equa sia il numero di cambi che vengono effettuati (rendendo pi\`u instabile lo stato globale).
+
+\putimage{images/task-allocator.png}{Comportamento del Task Allocator}{png:task-allocator}{0.99}
+
+\subsection{TaskExecutor}
+
+Un riassunto dell'implementazione del TaskExecutor \`e osservabile in figura \ref{png:task-executor}.
+
+\subsubsection{Letteratura}
+
+Alcuni paper \cite{parker2019fly} utilizzano come algoritmo generale un sistema basato su \textit{forze} (\textit{Force Field}) dove un drone risente di un'attrazione verso un punto di interesse e di una repulsione nei confronti degli altri droni.
+Generalmente la magnitudine della forza di repulsione \`e governata da un \textit{potenziale} (in particolare la letteratura \`e concorde nel consigliare il potenziale di Lennard-Jones \cite{hettiarachchi2009distributed}), mentre c'\`e pi\`u libert\`a sul come implementare la forza di attrazione.
+
+\subsubsection{Preparazione e Decollo}
+
+Dopo una fase iniziale di attesa (si attendono MAX\_REVIEWING\_SESSIONS=20 tick in attesa che il TaskAllocator prenda le sue decisioni circa il target da perseguire), il drone passa in modalit\`a decollo. La fase di volo pu\`o avvenire tramite un iniziale decollo verticale e un successivo volo quasi orizzontale verso il target, oppure tramite un decollo diretto che utilizza il vettore di movimento diretto verso il target per prendere quota.
+Il decollo \`e governato dall'esecutore tramite un audit dei droni nelle vicinanze per dare priorit\`a al decollo dei droni con ID pi\`u alto.
+
+\subsubsection{Volo}
+
+Un drone che ha raggiunto la quota di volo o che decolla direttamente deve eseguire un algoritmo che permette allo stesso di volare in direzione del target ma anche di evitare gli altri droni che ostacolano il percorso.
+Questo \`e fatto tramite l'applicazione di forze repulsive tra droni, in particolare tramite i tre potenziali che sono stati implementati: \textbf{GP e JP} sono due potenziali ispirati dalla gravit\`a, \textbf{LP} \`e derivato dal potenziale di Lennard Jones.
+
+Detta $d$ la distanza tra due corpi soggetti alla forza repulsiva (i droni), $A$ un moltiplicatore specifico di ogni potenziale utilizzato per ottimizzarne l'intensit\`a e $D$ una distanza media che si vuole mantenere tra due droni, si riportano le formule per ricavare le forze di attrazione:
+
+\begin{itemize}
+  \item $GP(d) = -A_{GP} \frac {|D - d|} {d}$
+  \item $JP(d) = -A_{JP} \frac {D - d} {d^2}$
+  \item $LP(d) = -A_{LP} 4 ({\frac {D} {d}}^6 - {\frac {D} {d}}^{12})$
+\end{itemize}
+
+Si riportano anche i valori dei coefficienti $A$ che abbiamo utilizzato:
+
+\begin{itemize}
+  \item $A_{GP} = 4.0$
+  \item $A_{JP} = 16.0$
+  \item $A_{LP} = 0.2$
+\end{itemize}
+
+\subsubsection{Criterio di Arresto}
+Come detto in precedenza, l'esecutore misura la differenza tra la posizione rilevata correntemente e quella rilevata nel tick precedente, la utilizza per stabilire la velocit\`a con cui si \`e mosso il drone in precedenza e in base alla magnitudine di essa decide se \`e fermo o quasi fermo.
+In particolare noi consideriamo fermo un drone la cui velocit\`a istantanea \`e inferiore a $10e-4$.
+
+\subsubsection{Rumore Desiderato}
+Infine abbiamo considerato la possibilit\`a di introdurre del rumore nel vettore della velocit\`a desiderata dall'esecutore per creare dell'instabilit\`a sufficiente a smuovere alcune situazioni di stallo nel volo dei droni che si potrebbero creare (ad esempio quando due droni vogliono andare nella stessa direzione ma nel verso opposto).
+Per realizzare ci\`o \`e fondamentale valutare l'impatto del coefficiente di rumore per evitare che l'instabilit\`a sia tale da non permettere alla simulazione di convergere.
+
+\putimage{images/task-executor.png}{Comportamento del Task Executor}{png:task-executor}{0.99}
+
+\subsection{Esempio Grafico}
+
+All'inizio i droni sono tutti a terra e vengono generati 5 target in posizioni randomiche; il tipo di decollo qui è verticale.
+
+\putimagecouple
+{\putsubimage{images/esempio/iterazione_zero_top.png}{Fase iniziale, vista dall'alto}{png:iterazione_zero_top}{0.45}{0.99}}
+{\putsubimage{images/esempio/iterazione_zero_left.png}{Fase iniziale, vista da sinistra}{png:iterazione_zero_left}{0.45}{0.99}}
+
+Dopo le fasi di review, i droni iniziano la fase di ascesa, dove con essa intendiamo che alcuni droni iniziano il decollo, mentre altri rimangono in attesa.
+
+\putimagecouple
+{\putsubimage{images/esempio/iterazione_venti_top.png}{Fase di Ascesa, vista dall'alto}{png:iterazione_venti_top}{0.45}{0.99}}
+{\putsubimage{images/esempio/iterazione_venti_left.png}{Fase di Ascesa, vista da sinistra}{png:iterazione_venti_left}{0.45}{0.99}}
+
+Alla fine della simulazione i droni si sono schierati in formazione attorno ai target.
+In questo esempio gli squadroni non sono equilibrati.
+Le strategie implementate in questo progetto devono tendere ad equilibrare le partizioni di droni e ad evitare le collisioni durante il volo.
+
+\putimagecouple
+{\putsubimage{images/esempio/iterazione_finale_top.png}{Simulazione terminata, vista dall'alto}{png:iterazione_finale_top}{0.45}{0.99}}
+{\putsubimage{images/esempio/iterazione_finale_left.png}{Simulazione terminata, vista da sinistra}{png:iterazione_finale_left}{0.45}{0.99}}
+
+\pagebreak
+
+\section{Esperimenti e Risultati}
+
+Sono state condotte delle simulazioni con ARGoS variando in ciascuna la strategia implementata ma mantenendo lo stesso Seed che inizializza il Pseudo Random Number Generator per confrontare direttamente approcci differenti nello stesso scenario.
+Si \`e scelto di testare singolarmente il TaskAllocator e il TaskExecutor per ridurre lo spazio delle soluzioni possibili.
+Ogni esecuzione di simulazione genera dei file di Log che vengono scritti dal Controller di ciascun drone. Analizzare i log ci ha permesso di produrre alcune metriche utili nell'analisi.
+
+\subsection{Prove sul TaskExecutor}
+
+In questo primo ciclo di simulazioni abbiamo utilizzato un TaskAllocator \textit{RANDOM\_\_NO\_REVIEW}, ovvero che inizializza i target di ogni drone casualmente senza attuare cambi.
+Questo perch\`e in questa fase ci interessa osservare come si comportano le strategie di TaskExecutor a parit\`a di seed e di scenario.
+Quindi per quanto riguarda il task executor, si \`e variato sul potenziale utilizzato nella Collision Avoidance, sul metodo di Decollo e sulla presenza o no del rumore.
+
+\subsubsection{Confrontare i Potenziali}
+
+Inizialmente ci siamo concentrati sul decollo verticale e in assenza di rumore sul vettore di velocit\`a dell'attuatore variando solo il potenziale utilizzato.
+In figura \ref{png:task-executor-noiseless-vertical-MeanDistanceFromTarget} \`e riportata la distanza media dei droni dal proprio target nel tempo.
+
+\putimage{images/experiments/task-executor-noiseless-vertical/MeanDistanceFromTarget.png}{Distanza media dal target nel tempo}{png:task-executor-noiseless-vertical-MeanDistanceFromTarget}{0.99}
+
+Si pu\`o notare come i potenziali \textbf{GP/JP} hanno curve di discesa pi\`u ripide e garantiscono una distanza media inferiore rispetto a \textbf{LP}.
+Da questo si pu\`o inferire come con LP la formazione di uno squadrone sia meno compatta (in figura \ref{png:task-executor-noiseless-vertical-MeanDistancesWithinSquadron} si osserva proprio questo).
+In generale \textbf{LP} d\`a la possibilit\`a di fissare una distanza minima tra i droni e di rispettarla. Lo stesso non vale per gli altri due potenziali.
+Questa distanza minima tra droni viene mantentuta da LP sia in volo ma anche quando i droni sono assiepati a ridosso del target.
+Questa pu\`o essere vista come un'arma a doppio taglio: certamente le distanze intra-squadrone sono pi\`u grandi e quindi il rischio di collisioni diminuisce significativamente, ma i droni quando arriveranno al target saranno e resteranno pi\`u separati tra di loro. A seconda del contesto applicativo, se questo aspetto risulta problematico, si pu\`o pensare di disattivare/ridurre le forze di repulsione quando siamo vicini al target.
+
+\putimage{images/experiments/task-executor-noiseless-vertical/MeanDistancesWithinSquadron.png}{Distanza media tra droni dello stesso squadrone nel tempo}{png:task-executor-noiseless-vertical-MeanDistancesWithinSquadron}{0.99}
+
+Vediamo come solo \textbf{LP} riesca a mantenere la distanza media inter-drone negli squadroni sopra una soglia fissata.
+
+\putimage{images/experiments/task-executor-noiseless-vertical/MinDistancesGlobally.png}{Distanza minima tra droni nel tempo}{png:task-executor-noiseless-vertical-MinDistancesGlobally}{0.99}
+
+LP \`e un potenziale pi\`u \textit{reattivo} nella misura in cui a distanze pi\`u basse \`e in grado di applicare una forza di separazione maggiore. Gli altri due sono pi\`u rilassati, quindi anche se complessivamente la distanza minima tende in ultima istanza ad essere non di molto inferiore a quella di LP, specie in fase di decollo dei droni possiamo avere diverse occasioni di collisione.
+Le distanze minime per\`o devono essere interpretate con cautela, perch\`e se \`e vero che con GP/JP abbiamo dei picchi negativi in termini di distanza, potrebbe trattarsi di qualche drone gi\`a decollato che sta sorvolando un drone in fase di ascesa senza per\`o mai sfiorarlo.
+
+\subsubsection{Decollo Diretto}
+
+Vediamo ora cosa succede se permettiamo ai droni di saltare la fase di ascesa verticale iniziale e quindi di decollare direttamente nella direzione del target.
+Nelle figure \ref{png:task-executor-noiseless-vertical-MeanSpeed} e \ref{png:task-executor-noiseless-direct-MeanSpeed} sono riportate le medie delle velocit\`a impresse dai droni sugli attuatori nel caso di decollo verticale e diretto.
+L'effetto principale che possiamo osservare \`e una diminuzione del tempo totale di formazione dovuto al fatto che il tempo medio di attesa per il decollo dei droni vicini \`e molto pi\`u basso (dovendo aspettare una generica partenza invece che il raggiungimento di una quota).
+Inoltre, nonostante si raggiunga una velocit\`a media pi\`u alta nel caso del decollo diretto, si noti come i droni rallentino abbastanza presto, e che globalmente ci mettano meno iterazioni a convergere, permettendo quindi ai droni di consumare meno energia rispetto al metodo a decollo verticale.
+
+\putimagecouple
+{\putsubimage{images/experiments/task-executor-noiseless-vertical/MeanSpeed.png}{Velocit\`a media voluta dai droni nel tempo con Decollo Verticale}{png:task-executor-noiseless-vertical-MeanSpeed}{0.4}{0.99}}
+{\putsubimage{images/experiments/task-executor-noiseless-direct/MeanSpeed.png}{Velocit\`a media voluta dai droni nel tempo con Decollo Diretto}{png:task-executor-noiseless-direct-MeanSpeed}{0.4}{0.99}}
+
+Nelle figure \ref{png:task-executor-noiseless-vertical-MinDistancesGlobally} e \ref{png:task-executor-noiseless-direct-MinDistancesGlobally} si riportano affiancate le distanze minime tra droni nei due metodi di decollo.
+Il decollo verticale \`e un'arma a doppio taglio perch\`e le distanze minime tra droni calano sensibilmente aumentando il rischio di collisioni.
+Nel caso in cui si opti per il decollo diretto risulta particolarmente utile adottare un potenziale reattivo (come LP) che possa separare fortemente i droni in volo.
+
+\putimagecouple
+{\putsubimage{images/experiments/task-executor-noiseless-vertical/MinDistancesGlobally.png}{Distanza minima tra droni nel tempo con Decollo Verticale}{png:task-executor-noiseless-vertical-MinDistancesGlobally}{0.4}{0.99}}
+{\putsubimage{images/experiments/task-executor-noiseless-direct/MinDistancesGlobally.png}{Distanza minima tra droni nel tempo con Decollo Diretto}{png:task-executor-noiseless-direct-MinDistancesGlobally}{0.4}{0.99}}
+
+\subsubsection{Aggiunta di Rumore}
+
+Come detto precedente il rumore \`e aggiunto in fase di attuazione del moto principalmente per aggiungere nondeterminismo in modo da smuovere alcune situazioni di deadlock, ma \`e anche utile per modellare un sistema a pi\`u alto realismo in cui i motori del drone non sono perfetti.
+L'instabilit\`a creata dal rumore rende le simulazioni pi\`u lunghe (ad esempio le figure \ref{png:task-executor-noiseless-vertical-MeanSpeed} e \ref{png:task-executor-noiseless-direct-MeanSpeed} versus le figure \ref{png:task-executor-noisy-vertical-MeanSpeed} e \ref{png:task-executor-noisy-direct-MeanSpeed}) perch\`e \`e pi\`u difficile raggiungere una condizione di equilibrio, per\`o per i parametri del rumore che abbiamo usato, i droni riescono lo stesso a raggiungere i loro target.
+
+In generela, gli andamenti delle metriche mostrate in precedenza si ripresentano invariati (al netto della distorsione data dal rumore).
+Sebbene si possano evitare deadlock pi\`u facilmente (\`e stato osservato sperimentalmente che in assenza di rumore \`e possibile che due droni rimangano fermi uno davanti all'altro), il tempo di esecuzione \`e quasi raddoppiato, determinando quindi un consumo energetico maggiore.
+In sostanza, nel caso il rumore sia aggiunto volontariamente, la sua magnitudine deve essere commisurata al vantaggio che si ottiene dal non determinismo rispetto allo svantaggio in termini di tempo ed energia.
+Nel caso in cui il rumore sia significativo risulta pi\`u importante scegliere il metodo di decollo che garantisce minor consumo di carburante ma anche pi\`u stabilit\`a.
+
+Nelle figure \ref{png:task-executor-noisy-vertical-MeanSpeed} e \ref{png:task-executor-noisy-direct-MeanSpeed} si riportano le velocit\`a medie dei droni nello scenario con rumore.
+Si osserva  come, a differenza dello scenario senza il rumore, i metodi basati sul decollo verticale garantiscano tempi di convergenza inferiori rispetto al decollo diretto (circa 1000 iterazioni per convergere versus 1400).
+Guardando nel caso non-rumoroso le figure \ref{png:task-executor-noiseless-vertical-MeanSpeed} e \ref{png:task-executor-noiseless-direct-MeanSpeed}, si nota che Decollo Verticale senza rumore passa dal convergere in circa 800 iterazioni a circa 1000 se si considera il rumore; mentre Decollo Diretto passa dal convergere in 700 iterazioni (senza rumore) a 1400 se si considera il rumore.
+Da questo si inferisce come il metodo Decollo Verticale sia meno soggetto al rumore e quindi da preferire nel caso di sistema molto rumoroso.
+Anche sotto il profilo del consumo energetico Decollo Verticale \`e meglio di Decollo Diretto, poich\`e ci mette molto meno tempo a convergere.
+
+\putimagecouple
+{\putsubimage{images/experiments/task-executor-noisy-vertical/MeanSpeed.png}{Velocit\`a media voluta dai droni nel tempo con Decollo Verticale e Rumore}{png:task-executor-noisy-vertical-MeanSpeed}{0.4}{0.99}}
+{\putsubimage{images/experiments/task-executor-noisy-direct/MeanSpeed.png}{Velocit\`a media voluta dai droni nel tempo con Decollo Diretto e Rumore}{png:task-executor-noisy-direct-MeanSpeed}{0.4}{0.99}}
+
+\subsection{TaskAllocator}
+
+Il secondo ciclo di simulazioni riguarda le strategie di Task Allocation, nello specifico in combinazione con un Task Executor con potenziale LP, decollo diretto e senza rumore (si \`e visto nella sezione precedente come minimizza il tempo di esecuzione mantenendo regolari le distanze tra droni).
+Nelle figure \ref{png:task-allocator-nearest-MeanDistanceFromTarget} e \ref{png:task-allocator-random-MeanDistanceFromTarget} si osserva come la strategia di scelta iniziale \textbf{Nearest} faccia ottenere distanze da percorrere dai singoli droni pi\`u corte rispetto a quanto fa l'inizializzazione Random. 
+Sempre su questo tema, un iniziaizzazione Nearest senza review successive fa raggiungere il minimo globale per quanto riguarda la distanza media che ogni drone deve percorrere, dato che dopo 200 iterazioni circa i droni sono gi\`a arrivati a destinazione.
+
+\putimagecouple
+{\putsubimage{images/experiments/task-allocator-nearest/MeanDistanceFromTarget.png}{Distanza media dal target nel tempo con scelta iniziale Nearest}{png:task-allocator-nearest-MeanDistanceFromTarget}{0.4}{0.99}}
+{\putsubimage{images/experiments/task-allocator-random/MeanDistanceFromTarget.png}{Distanza media dal target nel tempo con scelta iniziale Random}{png:task-allocator-random-MeanDistanceFromTarget}{0.4}{0.99}}
+
+In generale dato che i target vengono assegnati in base alla vicinanza, vale il principio di localit\`a, cio\`e che droni nello stesso squadrone, saranno probabilmente vicini tra di loro, con questo si spiegano i risultati di figura \ref{png:task-allocator-no-review-MeanDistancesWithinSquadron}.
+
+\putimage{images/experiments/task-allocator-no-review/MeanDistancesWithinSquadron.png}{Media delle distanze all'interno dello squadrone nel tempo}{png:task-allocator-no-review-MeanDistancesWithinSquadron}{0.80}
+
+Nei metodi dove si fa Review dell'assegnamento ai target (figure \ref{png:task-allocator-nearest-shortened-MeanDistanceFromTarget} e \ref{png:task-allocator-random-shortened-MeanDistanceFromTarget}), la review comporta per i casi in cui l'assegnamento iniziale era Nearest solo degli svantaggi in termini di distanza media dai bersagli; questo perch\`e Nearest era ottima come strategia per avere una bassa distanza iniziale di ogni drone dal suo bersaglio.
+Per i casi in cui l'assegnamento iniziale era Random, si vede come fare Review porti a guadagni in termini di distanza media dai target nel caso in cui si vada ad aggregarsi allo squadrone pi\`u bisognoso di droni, mentre se il riassegnamento \`e casuale, abbiamo risultati pi\`u contrastanti (la distanza pu\`o anche essere maggiore di quella nel caso noreview).
+
+Si ricorda che il numero di droni che ogni target richiede \`e uguale per ogni target, quindi interpretiamo negativamente eventuali squilibri di assegnamento tra target.
+
+Parlando ancora della possibilit\`a di cambio di target, si osserva come il criterio che obbliga il drone ad adottare il target meno popolato quando il proprio \`e in eccesso aiuta a ridurre la varianza di presenza dei droni nei target, quindi lo squilibrio di assegnamento di droni tra target (figura \ref{png:task-allocator-random-shortened-VarTargetDensityOverTime}), ma solo se la probabilit\`a di cambiare \`e contenuta, altrimenti si comporta come il criterio di cambio ad uno squadrone casuale (figura \ref{png:task-allocator-random-always-VarTargetDensityOverTime}).
+
+Questo accade perch\`e tanto pi\`u \`e alta la probabilit\`a di cambio nel metodo Minority, tanti pi\`u droni decideranno di cambiare target, e se il target in questione non \`e casuale ma sempre lo stesso (quello con meno droni rispetto al necessario) si creeranno forti sbilanciamenti. 
+Quindi in queste condizioni una scelta randomica aiuta a distribuire meglio i droni ma \`e evidente come si possa fare di meglio permettendo a pochi droni (quindi bassa probabilit\`a) di passare allo squadrone pi\`u svantaggiato.
+
+\putimagecouple
+{\putsubimage{images/experiments/task-allocator-nearest-shortened/MeanDistanceFromTarget.png}{distanza media dei droni dai target con scelta iniziale Nearest}{png:task-allocator-nearest-shortened-MeanDistanceFromTarget}{0.4}{0.99}}
+{\putsubimage{images/experiments/task-allocator-random-shortened/MeanDistanceFromTarget.png}{distanza media dei droni dai target con scelta iniziale Random}{png:task-allocator-random-shortened-MeanDistanceFromTarget}{0.4}{0.99}}
+
+\putimagecouple
+{\putsubimage{images/experiments/task-allocator-random-shortened/VarTargetDensityOverTime.png}{varianza di distribuzione dei droni sui target con probabilit\`a di cambio bassa}{png:task-allocator-random-shortened-VarTargetDensityOverTime}{0.4}{0.99}}
+{\putsubimage{images/experiments/task-allocator-random-always/VarTargetDensityOverTime.png}{confronto varianza di distribuzione dei droni sui target con probabilit\`a di cambio bassa e alta}{png:task-allocator-random-always-VarTargetDensityOverTime}{0.4}{0.99}}
+
+\pagebreak
+
+\section{Limiti del Modello}
+
+\subsection{ARGoS}
+
+ARGoS ha diversi problemi sia ad inserire molte entit\`a nell'ambiente, sia nel simulare in generale un'arena di grandi dimensioni o un numero grande di droni.
+Per questa ragione i nostri esperimenti si sono concentrati su simulazioni di al massimo 20 droni.
+
+Inoltre, come detto in precedenza, l'implementazione di ARGoS di alcune feature \`e incompleta, abbozzata o scorretta.
+Per i droni esso mette a disposizione due attuatori, uno basato sulla posizione (riceve in input una posizione e applica sul drone le forze necessarie a spostarlo nella posizione bersaglio) e uno basato sulla velocit\`a (riceve un vettore di velocit\`a e applica delle forze per raggiungere quella velocit\`a).
+Il secondo attuatore, quello che abbiamo usato, non solo non era "allacciato" (non veniva mai chiamata la funzione corrispondente nel drone) ma la sua implementazione prevedeva delle spinte assolutamente insufficienti anche solo per spostarlo.
+Di conseguenza abbiamo dovuto mettere mano al codice per adattare quella parte ad avere almeno la stessa reattivit\`a che possiede l'attuatore per posizione (il quale risultava invece funzionante).
+Il problema di questo aggiustamento risiede principalmente nel fatto che i coefficienti di reattivit\`a applicati sono ricavati in modo empirico, quindi se l'attuatore per posizione potesse vantare un certo grado di fedelt\`a, non si pu\`o dire lo stesso di quello basato su velocit\`a.
+
+\subsection{Forze di Separazione}
+
+Il sistema anti collisione che genera le forze prende in considerazione solo una direzione sul piano orizzontale ma per calcolare l'intensit\`a utilizza una distanza in 3 dimensioni.
+Questo perch\`e il modo con cui ARGoS gestisce le rotazioni (specie nei confronti del drone) non \`e del tutto chiaro e includendo anche la direzione verticale si producevano delle interazioni inconcludenti che sbalzano i droni fuori dalla rotta senza motivo.
+
+\subsection{Modellazione delle Collisioni}
+
+In generale le collisioni sono modellate come riduzione della distanza tra due droni oltre la soglia minima (diametro di un drone), infatti i droni sono stati pensati come dischi circolari di altezza molto ridotta, ma non abbiamo quantificato questa altezza che potrebbe essere critica per definire le collisioni in aria (per esempio se un drone sorvola un drone in ascesa).
+Se due droni collidono non \`e stato definito un comportamento specifico: nella realt\`a due droni che collidono a bassa velocit\`a ricevono un urto non sufficiente ad abbatterli, ma questo pu\`o dipendere anche dalla superficie di impatto (se per esempio l'urto avviene su un rotore) o dalla reattivit\`a/fragilit\`a strutturale dei droni stessi.
+
+
+\subsection{Generalit\`a}
+Eseguire pi\`u volte una simulazione con ARGoS con lo stesso \textit{seed} equivale a eseguirlo una volta sola, siccome la sorgente di casualit\`a \`e interamente generata a partire dal seed.
+
+Avendo fissato il numero di droni, di target e il seed che determina le posizioni di droni e target, i nostri esperimenti possono essere criticati per mancanza di generalità. I risultati tratti da questi sono riferiti a uno scenario con 20 droni, 5 target e 5 droni richiesti da ogni target, e ad una certa disposizione spaziale di target e droni, e per dimostrare che questi sono applicabili a scenari dove variano queste caratteristiche, bisognerebbe fare pi\`u esperimenti dove si varia diversi valori di queste variabili.
+
+Ad onor del vero, prima di raggiungere questo setup sperimentale finale abbiamo anche provato con seed diversi ad ogni esperimento (quindi la disposizione di droni e target cambia), per poi fare la media di 10 simulazioni per ogni strategia analizzata, e i risultati non sono stati poi così diversi dal caso di una simulazione sola per strategia.
+
+\subsection{Criterio di Arresto}
+
+Il criterio di arresto utilizzato dal nostro modello accomoda lo scenario in cui i droni sono arrivati in formazione ma non tiene in considerazione adeguatamente il caso in cui gli stessi finiscano in deadlock.
+Se due droni sono fermi uno davanti all'altro perch\`e vorrebbero procedere in direzione l'una opposta all'altra, sarebbero fermi esattamente come se fossero fermi in formazione su un target.
+Per evitare questa eventualit\`a le simulazioni sono state monitorate graficamente per assicurarsi che fossero valide e in aggiunta si \`e sperimentata l'aggiunta di rumore al vettore di velocit\`a passato all'attuatore.
+
+Inoltre quando \`e stato introdotto il decollo diretto, \`e stato necessario modificare l'algoritmo che verifica il criterio per accomodare questo metodo di decollo siccome per come \`e fatto il sistema di accelerazione di ARGoS la differenza di posizione per qualche iterazione era tale da far scattare il criterio di arresto.
+
+\section{Conclusioni}
+
+Sono state eseguite diverse simulazioni che hanno evidenziato aspetti positivi e negativi delle strategie implementate, rispetto anche a diversi scenari (rumore si/rumore no, un potenziale tra LP, GP e JP).
+
+I droni possono implementare una strategia di selezione del target iniziale tra: una scelta casuale ("strategia Random") o la scelta del target pi\`u vicino ("Nearest"). Fatta questa scelta, essa pu\`o essere messa in discussione o no. Farlo significa che per un certo numero di iterazioni si valuta se il target attuale ha un numero eccessivo di droni assegani a lui o no. Se ha troppi droni assegnati,  pu\`o, con una certa probabilit\`a, migrare verso uno squadrone casuale o verso quello con il target pi\`u bisognoso di droni ("strategia Probable Minority").
+
+Il drone pu\`o operare con degli attuatori a cui risce ad imprimere esattamente la direzione che vuole o con attuatori soggetti a rumore nel moto che provocano.
+
+I droni sono immersi in un ambiente con delle forze di repulsione tra droni, la cui intesit\`a \`e modellata da tre potenziali alternativi (LP, JP, GP).
+
+Abbiamo osservato come inizializzare con Nearest i target assegnati ai droni porta a una distanza media da percorrere durante la missione inferiore a quanto farebbe un inizializzazione Random, e a distanze tra droni dello stesso squadrone inferiori al caso Random.
+
+Con assegnamento iniziale Random, vale che per il metodo di revisione Probable Minority, tanto pi\`u \`e probabile la rilocazione, tanto pi\`u essi generano squadroni squilibrati nel numero di droni che gli appartengono.
+
+Abbiamo visto che in sistemi privi di rumore il Decollo Diretto permette di risparmiare eneriga, metre se \`e presente rumore allora il Decollo Verticale \`e molto meglio in questo.
+
+Il potenziale LP, in generale, risulta risultato il pi\`u adatto a garantire una distanza minima tra i droni in volo.
+
+\printbibliography[title={Bibliografia}]
+
+\end{document}
