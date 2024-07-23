@@ -72,6 +72,19 @@
 \end{frame}
 
 \begin{frame}
+\frametitle{Varianti del Task Allocator}
+Nelle prove sul task allocator variano i seguenti componenti:
+
+\begin{itemize}
+  \item Scelta iniziale target: \textbf{Random} o \textbf{Nearest}.
+  \item \textbf{Review}: presente o no.
+  \item (se review presente) Review: Probable \textbf{Minority} vs Probable \textbf{Random}
+\end{itemize}
+
+Durante le prove sul task allocator veniva usata la variante di task executor con decollo verticale, LP come potenziale e senza rumore negli attuatori.
+\end{frame}
+
+\begin{frame}
 \frametitle{Task Executor}
 \putimage{images/task-executor.png}{0.99}
 \end{frame}
@@ -93,6 +106,19 @@ Si riportano anche i valori dei coefficienti $A$ che abbiamo utilizzato:
   \item $A_{JP} = 16.0$
   \item $A_{LP} = 0.2$
 \end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Varianti del Task Executor}
+Nelle prove sul task executor variano i seguenti componenti:
+
+\begin{itemize}
+  \item \textbf{Potenziale}: uno tra LP, GP e JP.
+  \item \textbf{Rumore} nell'attuatore: presente o no.
+  \item Tipo di decollo: \textbf{Verticale} o \textbf{Diretto}.
+\end{itemize}
+
+Durante le prove sul task executor veniva usata la variante di task allocator con ???
 \end{frame}
 
 \section{Esempio}
