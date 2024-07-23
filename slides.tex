@@ -221,40 +221,61 @@ Esperimenti
 \end{frame}
 
 \section{I Limiti}
-
 \begin{frame}
-\frametitle{I Limiti}
 \centering
 \Huge
-ARGoS
+I Limiti
 \end{frame}
 
 \begin{frame}
-\frametitle{I Limiti}
-\centering
-\Huge
-Forze di Separazione
+\frametitle{ARGoS}
+Il simulatore ha diversi problemi:
+
+\begin{itemize}
+  \item rallenta molto con tante entit\`a e arena grande
+  \item difficolt\`a nell'inserire molte entit\`a nell'arena
+  \item attuatore velocit\`a con implementazione parziale e non allacciato
+  \item dati RAB devono essere scritti ogni volta
+\end{itemize}
 \end{frame}
 
 \begin{frame}
-\frametitle{I Limiti}
-\centering
-\Huge
-Modellazione delle Collisioni
+\frametitle{Forze di Separazione}
+ARGoS gestisce in modo non chiaro le rotazioni dei vettori $\Rightarrow$ Le forze repulsive per la separazione agiscono solo il piano orizzontale
 \end{frame}
 
 \begin{frame}
-\frametitle{I Limiti}
-\centering
-\Huge
-Criterio di Arresto
+\frametitle{Modellazione delle Collisioni}
+\begin{itemize}
+  \item I droni hanno un'altezza non definita e sono immaginati piatti
+  \item ARGoS non gestisce le collisioni tra droni
+  \item Nessun comportamento specifico in caso di collisione
+\end{itemize}
 \end{frame}
 
 \begin{frame}
-\frametitle{I Limiti}
-\centering
-\Huge
-Generalit\`a
+\frametitle{Criterio di Arresto}
+Problemi di implementazione per il Decollo Diretto e ambiguit\`a relativa al criterio:
+\begin{itemize}
+  \item Se il drone \`e arrivato allora \`e fermo
+  \item Se il drone \`e impossibilitato a proseguire allora \`e fermo
+\end{itemize}
+
+Contromisure:
+\begin{itemize}
+  \item Monitoraggio grafico
+  \item Aggiunta di rumore
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Generalit\`a}
+\begin{itemize}
+  \item La simulazione \`e deterministica fissato il seed $\Rightarrow$ esecuzione di una sola simulazione per combinazione.
+  \item Lo scenario \`e fissato (\# di droni, \# di target .. etc) $\Rightarrow$ pi\`u esecuzioni con seed diversi
+  \item Controllo di coerenza tra i risultati delle analisi di diverse esecuzioni
+\end{itemize}
 \end{frame}
 
 \section{Conclusioni}
