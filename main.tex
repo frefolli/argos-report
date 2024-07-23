@@ -178,6 +178,7 @@ Quest'ultimo scenario (non sfruttato nelle nostre analisi) \`e utile nel caso in
 
 Il drone \`e modellato come un \textbf{Agente Isteretico}, in quanto mantiene uno stato interno, percepisce l'ambiente tramite dei sensori e modifica l'ambiente tramite degli attuatori.
 Inoltre \`e un \textbf{Agente Ibrido} in quanto \`e la combinazione di due sotto-agenti autonomi tra loro che concorrono a determinare e perseguire gli obiettivi del drone.
+Infine \`e un \textbf{Agente Reattivo} perch\`e non dispone di una rappresentazione logica del mondo in cui \`e immerso e del proprio obiettivo, ma reagisce agli stimoli dell'ambiente.
 
 \paragraph{Codice Sorgente}
 
@@ -225,8 +226,8 @@ Un riassunto dell'implementazione del TaskExecutor \`e osservabile in figura \re
 
 \subsubsection{Letteratura}
 
-Molti paper consigliano come algoritmo generale un sistema basato su \textit{forze} dove un drone risente di un'attrazione verso un punto di interesse e di una repulsione nei confronti degli altri droni.
-Generalmente la magnitudine della forza di repulsione \`e governata da un \textit{potenziale}, mentre c'\`e pi\`u libert\`a sul come implementare la forza di attrazione.
+Alcuni paper \cite{parker2019fly} utilizzano come algoritmo generale un sistema basato su \textit{forze} (\textit{Force Field}) dove un drone risente di un'attrazione verso un punto di interesse e di una repulsione nei confronti degli altri droni.
+Generalmente la magnitudine della forza di repulsione \`e governata da un \textit{potenziale} (in particolare la letteratura \`e concorde nel consigliare il potenziale di Lennard-Jones \cite{hettiarachchi2009distributed}), mentre c'\`e pi\`u libert\`a sul come implementare la forza di attrazione.
 
 \subsubsection{Preparazione e Decollo}
 

@@ -1,9 +1,12 @@
 @all: main.pdf
 
-main.pdf: main.tex
+main.pdf: main.tex quotes.bib
 	pdflatex main.tex
 	bibtex main.aux
 	pdflatex main.tex
+
+rel.pdf: main.pdf
+	cp main.pdf rel.pdf
 
 lvim:
 	lvim main.tex
