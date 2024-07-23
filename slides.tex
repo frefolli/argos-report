@@ -10,7 +10,7 @@
 %\logo{\includegraphics[height=1cm]{logo_unimib.pdf}}
 
 \newcommand{\putimage}[2] {
-  \begin{figure}
+  \begin{figure}[H]
     \centering
     \includegraphics[width=#2\linewidth]{#1}
 	\end{figure}
@@ -46,34 +46,34 @@
 
 \begin{frame}
 \frametitle{Swarm Robotics}
-  \putimage{images/swarm\_robotics.JPG}{0.9}
+  \putimage{images/swarm\_robotics.png}{0.99}
 \end{frame}
 
 \begin{frame}
 \frametitle{ARGoS}
-\putimage{images/argos3.png}{0.9}
+\putimage{images/argos3.png}{0.85}
 \end{frame}
 
 \begin{frame}
 \frametitle{Architettura di ARGoS}
-\putimage{images/architecture.png}{0.9}
+\putimage{images/architecture.png}{0.85}
 \end{frame}
 
 \section{La Simulazione}
 
 \begin{frame}
 \frametitle{Modello della Simulazione}
-\putimage{images/simulation-model.png}{0.9}
+\putimage{images/simulation-model.png}{0.99}
 \end{frame}
 
 \begin{frame}
 \frametitle{Task Allocator}
-\putimage{images/task-allocator.png}{0.9}
+\putimage{images/task-allocator.png}{0.70}
 \end{frame}
 
 \begin{frame}
 \frametitle{Task Executor}
-\putimage{images/task-executor.png}{0.9}
+\putimage{images/task-executor.png}{0.99}
 \end{frame}
 
 \begin{frame}
@@ -99,17 +99,17 @@ Si riportano anche i valori dei coefficienti $A$ che abbiamo utilizzato:
 
 \begin{frame}
 \frametitle{Situazione Iniziale}
-\putimage{images/esempio/iterazione\_zero\_left.png}{0.9}
+\putimage{images/esempio/iterazione\_zero\_left.png}{0.85}
 \end{frame}
 
 \begin{frame}
 \frametitle{Fase di Ascesa}
-\putimage{images/esempio/iterazione\_venti\_left.png}{0.9}
+\putimage{images/esempio/iterazione\_venti\_left.png}{0.85}
 \end{frame}
 
 \begin{frame}
 \frametitle{Situazione Finale}
-\putimage{images/esempio/iterazione\_finale\_top.png}{0.9}
+\putimage{images/esempio/iterazione\_finale\_top.png}{0.85}
 \end{frame}
 
 \section{Esperimenti}
@@ -118,44 +118,60 @@ Si riportano anche i valori dei coefficienti $A$ che abbiamo utilizzato:
 
 \begin{frame}
 \frametitle{I Potenziali a Confronto / 1}
+  \putimage{images/slides/task-executor-noiseless-vertical/MeanDistanceFromTarget.png}{0.66}
 \end{frame}
 
 \begin{frame}
 \frametitle{I Potenziali a Confronto / 2}
+\putimage{images/slides/task-executor-noiseless-vertical/MeanDistancesWithinSquadron.png}{0.66}
 \end{frame}
 
 \begin{frame}
 \frametitle{I Potenziali a Confronto / 3}
+\putimage{images/slides/task-executor-noiseless-vertical/MinDistancesGlobally.png}{0.66}
 \end{frame}
 
 \begin{frame}
 \frametitle{Decollo Verticale e Decollo Diretto / 1}
+\putimagecouple{images/slides/task-executor-noiseless-vertical/MeanSpeed.png}{Velocit\`a media voluta dai droni nel tempo con Decollo Verticale}
+               {images/slides/task-executor-noiseless-direct/MeanSpeed.png}{Velocit\`a media voluta dai droni nel tempo con Decollo Diretto}
 \end{frame}
 
 \begin{frame}
 \frametitle{Decollo Verticale e Decollo Diretto / 2}
+\putimagecouple{images/slides/task-executor-noiseless-vertical/MinDistancesGlobally.png}{Distanza minima tra droni nel tempo con Decollo Verticale}
+               {images/slides/task-executor-noiseless-direct/MinDistancesGlobally.png}{Distanza minima tra droni nel tempo con Decollo Diretto}
 \end{frame}
 
 \begin{frame}
-\frametitle{Decollo Verticale e Decollo Diretto / 3}
+\frametitle{Aggiunta di Rumore}
+\putimagecouple{images/slides/task-executor-noisy-vertical/MeanSpeed.png}{Velocit\`a media voluta dai droni nel tempo con Decollo Verticale e Rumore}
+               {images/slides/task-executor-noisy-direct/MeanSpeed.png}{Velocit\`a media voluta dai droni nel tempo con Decollo Diretto e Rumore}
 \end{frame}
 
 \subsection{Task Allocator}
 
 \begin{frame}
 \frametitle{Scelta Iniziale: Random vs Nearest / 1}
+\putimagecouple{images/slides/task-allocator-nearest/MeanDistanceFromTarget.png}{Distanza media dal target nel tempo con scelta iniziale Nearest}
+               {images/slides/task-allocator-random/MeanDistanceFromTarget.png}{Distanza media dal target nel tempo con scelta iniziale Random}
 \end{frame}
 
 \begin{frame}
 \frametitle{Scelta Iniziale: Random vs Nearest / 2}
+\putimage{images/slides/task-allocator-no-review/MeanDistancesWithinSquadron.png}{0.66}
 \end{frame}
 
 \begin{frame}
 \frametitle{Fase di Review / 1}
+\putimagecouple{images/slides/task-allocator-nearest-shortened/MeanDistanceFromTarget.png}{distanza media dei droni dai target con scelta iniziale Nearest}
+               {images/slides/task-allocator-random-shortened/MeanDistanceFromTarget.png}{distanza media dei droni dai target con scelta iniziale Random}
 \end{frame}
 
 \begin{frame}
 \frametitle{Fase di Review / 2}
+\putimagecouple{images/slides/task-allocator-random-shortened/VarTargetDensityOverTime.png}{varianza di distribuzione dei droni sui target con probabilit\`a di cambio bassa}
+               {images/slides/task-allocator-random-always/VarTargetDensityOverTime.png}{confronto varianza di distribuzione dei droni sui target con probabilit\`a di cambio bassa e alta}
 \end{frame}
 
 \section{I Limiti}
